@@ -11,14 +11,12 @@ When a function in a Windows x64 binary is called, the stack frame is used in th
 
 ![](../../.gitbook/assets/image%20%28557%29.png)
 
-As an example, let's take a look at the function `msv1_0.LsaInitializePackage` in Ghidra.   
+As an example, let's take a look at the function `msv1_0.LsaInitializePackage` in Ghidra.  
 Below shows how the first four arguments are stored in ECX \(lower part of RCX\), RDX, R8 and R9:
 
 ![](../../.gitbook/assets/image%20%28616%29.png)
 
 ## References
 
-{% embed url="https://docs.microsoft.com/en-us/cpp/build/stack-usage?view=vs-2019" %}
-
-
+{% embed url="https://docs.microsoft.com/en-us/cpp/build/stack-usage?view=vs-2019" caption="" %}
 

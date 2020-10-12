@@ -30,9 +30,9 @@ Note, that the above process is just one way of achieving the same goal.
 
 ## Reminder
 
-As a reminder, we can easily see the syscall IDs for NT functions via WinDBG or any other debugger. 
+As a reminder, we can easily see the syscall IDs for NT functions via WinDBG or any other debugger.
 
-The syscall ID is 2 bytes in length and starts 4 bytes into the function, so for example, the syscall ID for `NtCreateFile` is `0x0055`, `NtQueryEvent` is `0x0056`, etc - see below image. 
+The syscall ID is 2 bytes in length and starts 4 bytes into the function, so for example, the syscall ID for `NtCreateFile` is `0x0055`, `NtQueryEvent` is `0x0056`, etc - see below image.
 
 Also - in green are the bytes, that I refer to as syscall stub for`NtCreateFile` and these are the bytes that we want to be able to retrieve at run-time for any given NT function, and hence this lab.
 
@@ -40,7 +40,7 @@ Also - in green are the bytes, that I refer to as syscall stub for`NtCreateFile`
 
 ## Extracting the Syscall Stub
 
-I wrote a function `GetSyscallStub`, that is responsible for steps 3 and 4  of the processes that I outlined in the `Overview` section.
+I wrote a function `GetSyscallStub`, that is responsible for steps 3 and 4 of the processes that I outlined in the `Overview` section.
 
 It allows me to find any given function's code location inside the ntdll.dll and carve out its syscall stub \(the first 23 bytes\):
 
@@ -69,7 +69,7 @@ Once `GetSyscallStub`is called, it will cycle through all the ntdll exported fun
 
 ![](../../.gitbook/assets/resolving-function-names.gif)
 
-Once the needed function name is resolved, the given function's syscall stub is extracted and stored in the `syscallStub` variable. 
+Once the needed function name is resolved, the given function's syscall stub is extracted and stored in the `syscallStub` variable.
 
 In the below GIF, we can see the instruction `mov eax, 0x55` when viewing the `syscallStub` variable in a disassembly view. Since we know that the `NtCreateFile` syscall ID is `0x0055`, this suggests we have extracted the syscall stub successfully:
 
@@ -85,8 +85,8 @@ We can now call `NtCreateFile`:
 
 ```cpp
 NtCreateFile(
-	&fileHandle, 
-	FILE_GENERIC_WRITE, 
+    &fileHandle, 
+    FILE_GENERIC_WRITE, 
     &oa, 
     &osb, 
     0, 
@@ -116,86 +116,86 @@ using myNtCreateFile = NTSTATUS(NTAPI*)(PHANDLE FileHandle, ACCESS_MASK DesiredA
 
 PVOID RVAtoRawOffset(DWORD_PTR RVA, PIMAGE_SECTION_HEADER section)
 {
-	return (PVOID)(RVA - section->VirtualAddress + section->PointerToRawData);
+    return (PVOID)(RVA - section->VirtualAddress + section->PointerToRawData);
 }
 
 BOOL GetSyscallStub(LPCSTR functionName, PIMAGE_EXPORT_DIRECTORY exportDirectory, LPVOID fileData, PIMAGE_SECTION_HEADER textSection, PIMAGE_SECTION_HEADER rdataSection, LPVOID syscallStub)
 {
-	PDWORD addressOfNames = (PDWORD)RVAtoRawOffset((DWORD_PTR)fileData + *(&exportDirectory->AddressOfNames), rdataSection);
-	PDWORD addressOfFunctions = (PDWORD)RVAtoRawOffset((DWORD_PTR)fileData + *(&exportDirectory->AddressOfFunctions), rdataSection);
-	BOOL stubFound = FALSE; 
+    PDWORD addressOfNames = (PDWORD)RVAtoRawOffset((DWORD_PTR)fileData + *(&exportDirectory->AddressOfNames), rdataSection);
+    PDWORD addressOfFunctions = (PDWORD)RVAtoRawOffset((DWORD_PTR)fileData + *(&exportDirectory->AddressOfFunctions), rdataSection);
+    BOOL stubFound = FALSE; 
 
-	for (size_t i = 0; i < exportDirectory->NumberOfNames; i++)
-	{
-		DWORD_PTR functionNameVA = (DWORD_PTR)RVAtoRawOffset((DWORD_PTR)fileData + addressOfNames[i], rdataSection);
-		DWORD_PTR functionVA = (DWORD_PTR)RVAtoRawOffset((DWORD_PTR)fileData + addressOfFunctions[i + 1], textSection);
-		LPCSTR functionNameResolved = (LPCSTR)functionNameVA;
-		if (std::strcmp(functionNameResolved, functionName) == 0)
-		{
-			std::memcpy(syscallStub, (LPVOID)functionVA, SYSCALL_STUB_SIZE);
-			stubFound = TRUE;
-		}
-	}
+    for (size_t i = 0; i < exportDirectory->NumberOfNames; i++)
+    {
+        DWORD_PTR functionNameVA = (DWORD_PTR)RVAtoRawOffset((DWORD_PTR)fileData + addressOfNames[i], rdataSection);
+        DWORD_PTR functionVA = (DWORD_PTR)RVAtoRawOffset((DWORD_PTR)fileData + addressOfFunctions[i + 1], textSection);
+        LPCSTR functionNameResolved = (LPCSTR)functionNameVA;
+        if (std::strcmp(functionNameResolved, functionName) == 0)
+        {
+            std::memcpy(syscallStub, (LPVOID)functionVA, SYSCALL_STUB_SIZE);
+            stubFound = TRUE;
+        }
+    }
 
-	return stubFound;
+    return stubFound;
 }
 
 int main(int argc, char* argv[]) {
-	char syscallStub[SYSCALL_STUB_SIZE] = {};
-	SIZE_T bytesWritten = 0;
-	DWORD oldProtection = 0;
-	HANDLE file = NULL;
-	DWORD fileSize = NULL;
-	DWORD bytesRead = NULL;
-	LPVOID fileData = NULL;
-	
-	// variables for NtCreateFile
-	OBJECT_ATTRIBUTES oa;
-	HANDLE fileHandle = NULL;
-	NTSTATUS status = NULL;
-	UNICODE_STRING fileName;
-	RtlInitUnicodeString(&fileName, (PCWSTR)L"\\??\\c:\\temp\\pw.log");
-	IO_STATUS_BLOCK osb;
-	ZeroMemory(&osb, sizeof(IO_STATUS_BLOCK));
-	InitializeObjectAttributes(&oa, &fileName, OBJ_CASE_INSENSITIVE, NULL, NULL);
+    char syscallStub[SYSCALL_STUB_SIZE] = {};
+    SIZE_T bytesWritten = 0;
+    DWORD oldProtection = 0;
+    HANDLE file = NULL;
+    DWORD fileSize = NULL;
+    DWORD bytesRead = NULL;
+    LPVOID fileData = NULL;
 
-	// define NtCreateFile
-	myNtCreateFile NtCreateFile = (myNtCreateFile)(LPVOID)syscallStub;
-	VirtualProtect(syscallStub, SYSCALL_STUB_SIZE, PAGE_EXECUTE_READWRITE, &oldProtection);
-	
-	file = CreateFileA("c:\\windows\\system32\\ntdll.dll", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	fileSize = GetFileSize(file, NULL);
-	fileData = HeapAlloc(GetProcessHeap(), 0, fileSize);
-	ReadFile(file, fileData, fileSize, &bytesRead, NULL);
+    // variables for NtCreateFile
+    OBJECT_ATTRIBUTES oa;
+    HANDLE fileHandle = NULL;
+    NTSTATUS status = NULL;
+    UNICODE_STRING fileName;
+    RtlInitUnicodeString(&fileName, (PCWSTR)L"\\??\\c:\\temp\\pw.log");
+    IO_STATUS_BLOCK osb;
+    ZeroMemory(&osb, sizeof(IO_STATUS_BLOCK));
+    InitializeObjectAttributes(&oa, &fileName, OBJ_CASE_INSENSITIVE, NULL, NULL);
 
-	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)fileData;
-	PIMAGE_NT_HEADERS imageNTHeaders = (PIMAGE_NT_HEADERS)((DWORD_PTR)fileData + dosHeader->e_lfanew);
-	DWORD exportDirRVA = imageNTHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
-	PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(imageNTHeaders);
-	PIMAGE_SECTION_HEADER textSection = section;
-	PIMAGE_SECTION_HEADER rdataSection = section;
-	
-	for (int i = 0; i < imageNTHeaders->FileHeader.NumberOfSections; i++) 
-	{
-		if (std::strcmp((CHAR*)section->Name, (CHAR*)".rdata") == 0) { 
-			rdataSection = section;
-			break;
-		}
-		section++;
-	}
+    // define NtCreateFile
+    myNtCreateFile NtCreateFile = (myNtCreateFile)(LPVOID)syscallStub;
+    VirtualProtect(syscallStub, SYSCALL_STUB_SIZE, PAGE_EXECUTE_READWRITE, &oldProtection);
 
-	PIMAGE_EXPORT_DIRECTORY exportDirectory = (PIMAGE_EXPORT_DIRECTORY)RVAtoRawOffset((DWORD_PTR)fileData + exportDirRVA, rdataSection);
-	
-	GetSyscallStub("NtCreateFile", exportDirectory, fileData, textSection, rdataSection, syscallStub);
-	NtCreateFile(&fileHandle, FILE_GENERIC_WRITE, &oa, &osb, 0, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_WRITE, FILE_OVERWRITE_IF, FILE_SYNCHRONOUS_IO_NONALERT, NULL,	0);
+    file = CreateFileA("c:\\windows\\system32\\ntdll.dll", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    fileSize = GetFileSize(file, NULL);
+    fileData = HeapAlloc(GetProcessHeap(), 0, fileSize);
+    ReadFile(file, fileData, fileSize, &bytesRead, NULL);
 
-	return 0;
+    PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)fileData;
+    PIMAGE_NT_HEADERS imageNTHeaders = (PIMAGE_NT_HEADERS)((DWORD_PTR)fileData + dosHeader->e_lfanew);
+    DWORD exportDirRVA = imageNTHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
+    PIMAGE_SECTION_HEADER section = IMAGE_FIRST_SECTION(imageNTHeaders);
+    PIMAGE_SECTION_HEADER textSection = section;
+    PIMAGE_SECTION_HEADER rdataSection = section;
+
+    for (int i = 0; i < imageNTHeaders->FileHeader.NumberOfSections; i++) 
+    {
+        if (std::strcmp((CHAR*)section->Name, (CHAR*)".rdata") == 0) { 
+            rdataSection = section;
+            break;
+        }
+        section++;
+    }
+
+    PIMAGE_EXPORT_DIRECTORY exportDirectory = (PIMAGE_EXPORT_DIRECTORY)RVAtoRawOffset((DWORD_PTR)fileData + exportDirRVA, rdataSection);
+
+    GetSyscallStub("NtCreateFile", exportDirectory, fileData, textSection, rdataSection, syscallStub);
+    NtCreateFile(&fileHandle, FILE_GENERIC_WRITE, &oa, &osb, 0, FILE_ATTRIBUTE_NORMAL, FILE_SHARE_WRITE, FILE_OVERWRITE_IF, FILE_SYNCHRONOUS_IO_NONALERT, NULL,    0);
+
+    return 0;
 }
 ```
 
 ## References
 
-{% embed url="https://github.com/odzhan/injection/blob/ad8e7a11899ffb2d9467a8ea44c6f3755d13b00e/syscalls/inject\_dll.c\#L260" %}
+{% embed url="https://github.com/odzhan/injection/blob/ad8e7a11899ffb2d9467a8ea44c6f3755d13b00e/syscalls/inject\_dll.c\#L260" caption="" %}
 
-{% embed url="https://github.com/am0nsec/HellsGate" %}
+{% embed url="https://github.com/am0nsec/HellsGate" caption="" %}
 

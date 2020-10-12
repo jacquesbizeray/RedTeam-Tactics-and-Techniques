@@ -41,5 +41,5 @@ Click OK and you should now be ready to start debugging the host `192.168.2.68`:
 
 ## References
 
-{% embed url="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/setting-up-a-network-debugging-connection-automatically" %}
+{% embed url="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/setting-up-a-network-debugging-connection-automatically" caption="" %}
 

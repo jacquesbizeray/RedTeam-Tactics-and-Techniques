@@ -60,19 +60,19 @@ in the powershell profile, add the following powershell function:
 ```csharp
 function Install-Driver($name)
 {
-	$cleanName = $name -replace ".sys|.\\", ""
+    $cleanName = $name -replace ".sys|.\\", ""
 
-	sc.exe stop $cleanName
-	sc.exe delete $cleanName
+    sc.exe stop $cleanName
+    sc.exe delete $cleanName
 
-	cp $name c:\windows\system32\drivers\ -verbose -force
-	sc.exe create $cleanName type= kernel start= demand error= normal binPath= c:\windows\System32\Drivers\$cleanName.sys DisplayName= $cleanName
+    cp $name c:\windows\system32\drivers\ -verbose -force
+    sc.exe create $cleanName type= kernel start= demand error= normal binPath= c:\windows\System32\Drivers\$cleanName.sys DisplayName= $cleanName
 
-	sc.exe start $cleanName
+    sc.exe start $cleanName
 }
 ```
 
-The above function `Install-Driver` takes one parameter `$name`, which signifies a driver name that we want to install. 
+The above function `Install-Driver` takes one parameter `$name`, which signifies a driver name that we want to install.
 
 The function `Install-Driver` will:
 
@@ -106,7 +106,7 @@ Install-Driver wdm-helloworld.sys
 
 ### Stepping through Source Code
 
-If we have source code for the driver we want to debug, we can load its source code and step through it in WinDBG.  Load the source code via the `Source > Open Source File` and re-load the driver again using `Install-Driver` function:
+If we have source code for the driver we want to debug, we can load its source code and step through it in WinDBG. Load the source code via the `Source > Open Source File` and re-load the driver again using `Install-Driver` function:
 
 ![Stepping through driver&apos;s C code](../../.gitbook/assets/debugging-kernel-source-code.gif)
 

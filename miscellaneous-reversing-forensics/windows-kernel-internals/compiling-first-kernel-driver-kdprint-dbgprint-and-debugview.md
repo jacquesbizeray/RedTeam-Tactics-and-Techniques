@@ -36,7 +36,7 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT DriverObject, _In_ PUNICODE_STRING Regi
     WDF_DRIVER_CONFIG_INIT(&config, EvtDriverDeviceAdd);
     config.EvtDriverUnload = UnloadDriver;
     NTSTATUS status = WdfDriverCreate(DriverObject, RegistryPath, WDF_NO_OBJECT_ATTRIBUTES, &config, WDF_NO_HANDLE);
-    
+
     DbgPrint("Driver loaded");
 
     return status;
@@ -47,7 +47,7 @@ NTSTATUS EvtDriverDeviceAdd(_In_ WDFDRIVER Driver,_Inout_ PWDFDEVICE_INIT Device
     UNREFERENCED_PARAMETER(Driver);
     WDFDEVICE device;
     NTSTATUS status = WdfDeviceCreate(&DeviceInit, WDF_NO_OBJECT_ATTRIBUTES, &device);
-    
+
     return status;
 }
 ```
@@ -100,19 +100,19 @@ Below is a simple WDM driver that can be compiled and then loaded and stopped wi
 
 void DriverUnload(PDRIVER_OBJECT dob)
 {
-	UNREFERENCED_PARAMETER(dob);
-	DbgPrint("Driver unloaded");
+    UNREFERENCED_PARAMETER(dob);
+    DbgPrint("Driver unloaded");
 }
 
 NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) {
 
-	UNREFERENCED_PARAMETER(DriverObject);
-	UNREFERENCED_PARAMETER(RegistryPath);
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNREFERENCED_PARAMETER(RegistryPath);
 
-	DriverObject->DriverUnload = DriverUnload;
-	DbgPrint("Driver loaded");
+    DriverObject->DriverUnload = DriverUnload;
+    DbgPrint("Driver loaded");
 
-	return STATUS_SUCCESS;
+    return STATUS_SUCCESS;
 }
 ```
 
@@ -122,7 +122,7 @@ Below shows how our driver is loaded and unloaded via OSR Loader while DbgView p
 
 ## References
 
-{% embed url="https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/writing-a-very-small-kmdf--driver" %}
+{% embed url="https://docs.microsoft.com/en-us/windows-hardware/drivers/gettingstarted/writing-a-very-small-kmdf--driver" caption="" %}
 
-{% embed url="http://www.osronline.com/article.cfm%5earticle=295.htm" %}
+{% embed url="http://www.osronline.com/article.cfm%5earticle=295.htm" caption="" %}
 

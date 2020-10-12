@@ -46,5 +46,5 @@ Note that hovering the shortcut reveals that the program to be launched is the p
 
 ## Reference
 
-{% embed url="https://attack.mitre.org/techniques/T1023/" %}
+{% embed url="https://attack.mitre.org/techniques/T1023/" caption="" %}
 

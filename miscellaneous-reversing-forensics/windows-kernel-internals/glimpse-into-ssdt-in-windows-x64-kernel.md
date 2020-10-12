@@ -2,7 +2,7 @@
 
 ## What is SSDT
 
-System Service Dispatch Table or SSDT, simply is an array of addresses to kernel routines for 32 bit operating systems or an array of relative offsets to the same routines for 64 bit operating systems. 
+System Service Dispatch Table or SSDT, simply is an array of addresses to kernel routines for 32 bit operating systems or an array of relative offsets to the same routines for 64 bit operating systems.
 
 SSDT is the first member of the Service Descriptor Table kernel memory structure as shown below:
 
@@ -23,9 +23,9 @@ SSDTs used to be hooked by AVs as well as rootkits that wanted to hide files, re
 
 When a program in user space calls a function, say `CreateFile`, eventually code execution is transfered to `ntdll!NtCreateFile` and via a **syscall** to the kernel routine `nt!NtCreateFile`.
 
-Syscall is merely an index in the System Service Dispatch Table \(SSDT\) which contains an array of pointers for 32 bit OS'es \(or relative offsets to the Service Dispatch Table for 64 bit OSes\) to all critical system APIs like `ZwCreateFile`,  `ZwOpenFile` and so on..
+Syscall is merely an index in the System Service Dispatch Table \(SSDT\) which contains an array of pointers for 32 bit OS'es \(or relative offsets to the Service Dispatch Table for 64 bit OSes\) to all critical system APIs like `ZwCreateFile`, `ZwOpenFile` and so on..
 
-Below is a simplified diagram that shows how offsets in SSDT `KiServiceTable`  are converted to absolute addresses of corresponding kernel routines:
+Below is a simplified diagram that shows how offsets in SSDT `KiServiceTable` are converted to absolute addresses of corresponding kernel routines:
 
 ![](../../.gitbook/assets/image%20%28305%29.png)
 
@@ -93,7 +93,7 @@ lm ntdll
 
 ![](../../.gitbook/assets/image%20%28500%29.png)
 
-Let's now find the syscall for `ntdll!NtCreateFile`: 
+Let's now find the syscall for `ntdll!NtCreateFile`:
 
 ```erlang
 0: kd> u ntdll!ntcreatefile L2
@@ -150,9 +150,9 @@ fffff80192212dc0 - nt!NtWriteFile (fffff801`92212dc0)
 
 ## References
 
-{% embed url="https://www.codeproject.com/Articles/1191465/The-Quest-for-the-SSDTs" %}
+{% embed url="https://www.codeproject.com/Articles/1191465/The-Quest-for-the-SSDTs" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/-printf" %}
+{% embed url="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/-printf" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/-foreach" %}
+{% embed url="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/-foreach" caption="" %}
 

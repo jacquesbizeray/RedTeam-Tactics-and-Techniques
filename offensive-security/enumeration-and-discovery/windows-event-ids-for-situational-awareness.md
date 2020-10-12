@@ -1,6 +1,6 @@
 # Windows Event IDs and Others for Situational Awareness
 
-Below is a living list of Windows event IDs and other miscellaenous snippets, that may be useful for  situational awareness, once you are on a box:
+Below is a living list of Windows event IDs and other miscellaenous snippets, that may be useful for situational awareness, once you are on a box:
 
 <table>
   <thead>
@@ -125,12 +125,8 @@ Below is a living list of Windows event IDs and other miscellaenous snippets, th
       <td style="text-align:left">
         <p>Get-WinEvent -FilterHashtable @{ LogName=&apos;Microsoft-Windows-TerminalServices-LocalSessionManager/Operational&apos;;
           id=&apos;21&apos; } | select timecreated, message | ft -AutoSize -Wrap</p>
-        <p></p>
         <p>Get-WinEvent -FilterHashtable @{ LogName=&apos;Microsoft-Windows-RemoteDesktopServices-RdpCoreTS/Operational&apos;;
           id=131 } | select timecreated, message | ft -AutoSize -Wrap
-          <br />
-        </p>
-        <p>
           <br />
         </p>
         <p>Get-WinEvent -FilterHashtable @{ LogName=&apos;Microsoft-Windows-TerminalServices-RemoteConnectionManager/Operational&apos;;
@@ -142,7 +138,6 @@ Below is a living list of Windows event IDs and other miscellaenous snippets, th
       <td style="text-align:left">
         <p>Get-WinEvent -FilterHashtable @{ LogName=&apos;Microsoft-Windows-WinRM/Operational&apos;;
           id=6 }</p>
-        <p></p>
         <p>Get-WinEvent -FilterHashtable @{ LogName=&apos;Microsoft-Windows-WinRM/Operational&apos;;
           id=80 }</p>
       </td>
@@ -152,7 +147,6 @@ Below is a living list of Windows event IDs and other miscellaenous snippets, th
       <td style="text-align:left">
         <p>Get-WinEvent -FilterHashtable @{ LogName=&apos;Microsoft-Windows-WinRM/Operational&apos;;
           id=91 }</p>
-        <p></p>
         <p>Get-WinEvent -FilterHashtable @{ LogName=&apos;Microsoft-Windows-WMI-Activity/Operational&apos;;
           id=5857 } | ? {$_.message -match &apos;Win32_WIN32_TERMINALSERVICE_Prov|CIMWin32&apos;}</p>
       </td>

@@ -79,9 +79,9 @@ lsadump::dcsync /user:krbtgt
 
 ## References
 
-{% embed url="http://www.harmj0y.net/blog/redteaming/abusing-active-directory-permissions-with-powerview/" %}
+{% embed url="http://www.harmj0y.net/blog/redteaming/abusing-active-directory-permissions-with-powerview/" caption="" %}
 
-{% embed url="https://blog.stealthbits.com/extracting-user-password-data-with-mimikatz-dcsync/" %}
+{% embed url="https://blog.stealthbits.com/extracting-user-password-data-with-mimikatz-dcsync/" caption="" %}
 
-{% embed url="https://medium.com/@jsecurity101/syncing-into-the-shadows-bbd656dd14c8" %}
+{% embed url="https://medium.com/@jsecurity101/syncing-into-the-shadows-bbd656dd14c8" caption="" %}
 

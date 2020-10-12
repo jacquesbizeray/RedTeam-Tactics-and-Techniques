@@ -8,7 +8,7 @@ Under the hood, RdpThief does the following:
 * intercepts the user supplied username, password, hostname during authentication
 * writes out intercepted credentials and hostname to a file
 
-These are some notes of me tinkering with [API Monitor](http://www.rohitab.com/apimonitor), WinDBG and Detours \(Microsoft's library for hooking Windows APIs\) and reproducing some of the steps Rio took during his research and development of [RdpThief](https://github.com/0x09AL/RdpThief). 
+These are some notes of me tinkering with [API Monitor](http://www.rohitab.com/apimonitor), WinDBG and Detours \(Microsoft's library for hooking Windows APIs\) and reproducing some of the steps Rio took during his research and development of [RdpThief](https://github.com/0x09AL/RdpThief).
 
 These notes will serve me as a reference for future on how to identify and hook interesting functions that can be useful when writing offensive tooling.
 
@@ -26,7 +26,7 @@ If API monitor was attached to mstsc.exe when we tried to authenticate to the re
 
 ### Intercepting Username
 
-If we search for a string `spotless`, we will find some functions that take `spotless` as a string argument and one of those functions is `CredIsMarshaledCredentialW` as shown below: 
+If we search for a string `spotless`, we will find some functions that take `spotless` as a string argument and one of those functions is `CredIsMarshaledCredentialW` as shown below:
 
 ![CredIsMarshaledCredentialW contains the string spotless](../../.gitbook/assets/find-computername.gif)
 
@@ -67,7 +67,7 @@ du @rdx
 
 ### Intercepting Password
 
-We now know the functions required to hook for intercepting the username and the hostname. What's left is hooking the function that deals in one way or another with the password and from Rio's article, we know it's the DPAPI `CryptProtectMemory`. 
+We now know the functions required to hook for intercepting the username and the hostname. What's left is hooking the function that deals in one way or another with the password and from Rio's article, we know it's the DPAPI `CryptProtectMemory`.
 
 Weirdly, searching for my password in API Monitor resulted in no results although I could see it in plain text in `CryptUnprotectMemory`:
 
@@ -101,15 +101,15 @@ Earlier, I noted the 32 bytes encrypted blob seen in `CryptProtectMemory` functi
 
 ## RdpThief in Action
 
-Compiling RdpThief provides us with 2 DLLs for 32 and 64 bit architectures. Let's inject the 64 bit DLL into mstsc.exe and attempt to RDP into `ws01` - we see the credentials getting intercepted and written to a file: 
+Compiling RdpThief provides us with 2 DLLs for 32 and 64 bit architectures. Let's inject the 64 bit DLL into mstsc.exe and attempt to RDP into `ws01` - we see the credentials getting intercepted and written to a file:
 
 ![](../../.gitbook/assets/inject-rdp-thief.gif)
 
 ## Intercepting Hostname via CredReadW
 
-I wanted to confirm if my previous hypothesis about hooking `CredReadW` for intercepting the hostname was possible, so I made some quick changes to the RdpThief's project to test it. 
+I wanted to confirm if my previous hypothesis about hooking `CredReadW` for intercepting the hostname was possible, so I made some quick changes to the RdpThief's project to test it.
 
-I commented out the `_SspiPrepareForCredRead` signature and hooked `CreadReadW` with a new function called `HookedCredReadW` which will pop a message box each time `CredReadW` is called and print its first argument as the message box text. 
+I commented out the `_SspiPrepareForCredRead` signature and hooked `CreadReadW` with a new function called `HookedCredReadW` which will pop a message box each time `CredReadW` is called and print its first argument as the message box text.
 
 Also, it will update the `lpServer` variable which is later written to the file creds.txt together with the username and password.
 
@@ -127,15 +127,15 @@ Compiling and injecting the new RdpThief DLL confirms that the `CredReadW` can b
 
 ## References
 
-{% embed url="https://www.mdsec.co.uk/2019/11/rdpthief-extracting-clear-text-credentials-from-remote-desktop-clients/" %}
+{% embed url="https://www.mdsec.co.uk/2019/11/rdpthief-extracting-clear-text-credentials-from-remote-desktop-clients/" caption="" %}
 
-{% embed url="https://github.com/0x09AL/RdpThief" %}
+{% embed url="https://github.com/0x09AL/RdpThief" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/cpp/build/x64-calling-convention?view=vs-2019" %}
+{% embed url="https://docs.microsoft.com/en-us/cpp/build/x64-calling-convention?view=vs-2019" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credismarshaledcredentialw" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credismarshaledcredentialw" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs\#manually-locate-the-files-on-your-machine" %}
+{% embed url="https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs\#manually-locate-the-files-on-your-machine" caption="" %}
 
-{% embed url="https://github.com/mantvydasb/RdpThief" %}
+{% embed url="https://github.com/mantvydasb/RdpThief" caption="" %}
 

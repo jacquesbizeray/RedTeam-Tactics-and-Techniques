@@ -35,7 +35,7 @@ docker build -t spiderfoot .
 
 Check if the image got created successfully:
 
-```
+```text
 docker images
 ```
 
@@ -81,5 +81,5 @@ Drilling down to one of the above categories - DNS records:
 
 ## References
 
-{% embed url="https://www.spiderfoot.net/blog/spiderfoot-running-in-docker/" %}
+{% embed url="https://www.spiderfoot.net/blog/spiderfoot-running-in-docker/" caption="" %}
 

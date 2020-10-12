@@ -48,5 +48,5 @@ Compile and run the binary. If the shellcode runs successfully, we should see tw
 
 ## References
 
-{% embed url="https://github.com/monoxgas/sRDI/tree/master/PowerShell" %}
+{% embed url="https://github.com/monoxgas/sRDI/tree/master/PowerShell" caption="" %}
 

@@ -59,7 +59,7 @@ When debugging the binary, if we set the EIP to point to 4D8000‬ and let the d
 ![](../../.gitbook/assets/backdoored-pe.gif)
 
 {% hint style="info" %}
-In the above screenshot, `pushad` and `pushdf` are the first instructions at 4d8000 - it's not shown in this lab how those two instructions were inserted there, but there is no magic  - just add   bytes `60 9c` before the shellcode at 0xCD200 in the bginfo and you're set.
+In the above screenshot, `pushad` and `pushdf` are the first instructions at 4d8000 - it's not shown in this lab how those two instructions were inserted there, but there is no magic - just add bytes `60 9c` before the shellcode at 0xCD200 in the bginfo and you're set.
 {% endhint %}
 
 ## Redirecting Code Execution Flow
@@ -91,7 +91,7 @@ Let's now hijack the bginfo.exe code execution flow by overwriting any instructi
 One of the first 5-byte instructions we can see is `mov edi, bb40e64e` at 00467b29:
 
 {% hint style="warning" %}
-**Important**   
+**Important**  
 We are about to overwrite the instruction `mov edi, 0xbb40e64e` at **00467b29**, hence we need to remember it for later as explained in 1.2.
 {% endhint %}
 
@@ -200,11 +200,11 @@ This technique is not particularly stealthy. Rather than adding a new code secti
 
 ## References
 
-{% embed url="https://captmeelo.com/exploitdev/osceprep/2018/07/16/backdoor101-part1.html" %}
+{% embed url="https://captmeelo.com/exploitdev/osceprep/2018/07/16/backdoor101-part1.html" caption="" %}
 
-{% embed url="https://medium.com/@codingkarma/pe-section-header-injection-using-code-cave-1451912d814c" %}
+{% embed url="https://medium.com/@codingkarma/pe-section-header-injection-using-code-cave-1451912d814c" caption="" %}
 
-{% embed url="https://pentest.blog/art-of-anti-detection-2-pe-backdoor-manufacturing/" %}
+{% embed url="https://pentest.blog/art-of-anti-detection-2-pe-backdoor-manufacturing/" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject" caption="" %}
 

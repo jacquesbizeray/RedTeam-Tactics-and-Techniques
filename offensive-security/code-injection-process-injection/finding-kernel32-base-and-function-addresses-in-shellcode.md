@@ -1,6 +1,6 @@
 # Finding Kernel32 Base and Function Addresses in Shellcode
 
-The purpose of this lab is to understand how shellcode finds kernel32 base address in memory of the process it's running in and then uses to find addresses of other functions that it requires in order to achieve its goal. 
+The purpose of this lab is to understand how shellcode finds kernel32 base address in memory of the process it's running in and then uses to find addresses of other functions that it requires in order to achieve its goal.
 
 In this lab I will write some assembly to find the kernel32 dll's base address, resolve `WinExec` function address in memory and call it to open `calc.exe`.
 
@@ -50,7 +50,7 @@ dt _PEB_LDR_DATA
 
 ![](../../.gitbook/assets/image%20%28418%29.png)
 
-`InMemoryOrderModuleList` points to another structure we're interested in - `LDR_DATA_TABLE_ENTRY` even though WinDBG suggests the structure type is `LIST_ENTRY`. As confusing as it may seem at first, this is actually right, since `InMemoryOrderModuleList` is a doubly linked list where each list item points to an `LDR_DATA_TABLE_ENTRY` structure. 
+`InMemoryOrderModuleList` points to another structure we're interested in - `LDR_DATA_TABLE_ENTRY` even though WinDBG suggests the structure type is `LIST_ENTRY`. As confusing as it may seem at first, this is actually right, since `InMemoryOrderModuleList` is a doubly linked list where each list item points to an `LDR_DATA_TABLE_ENTRY` structure.
 
 Remember, since the shellcode is looking for the kernel32.dll base address, the `LDR_DATA_TABLE_ENTRY` is the last structure in the chain of structures it needs to locate. Once the structure is located, the member `DllBase` at offset 0x18 stores the base address of the module:
 
@@ -78,7 +78,7 @@ dt _peb @$peb
 
 ![Ldr points to 0x77de0c40](../../.gitbook/assets/image%20%28164%29.png)
 
-From the above, we can see that the `PEB.Ldr` \(`Ldr` member is at offset 0x00c\) points to an `PEB_LDR_DATA` structure at 0x77de0c40. 
+From the above, we can see that the `PEB.Ldr` \(`Ldr` member is at offset 0x00c\) points to an `PEB_LDR_DATA` structure at 0x77de0c40.
 
 We can view the `PEB_LDR_DATA` structure at 0x77de0c40 by overlaying it with address pointed to by the PEB.Ldr \(0xc\) structure like so:
 
@@ -197,20 +197,20 @@ Let's try finding the kernel32 dll base address in the process memory using all 
 assume fs:nothing
 
 .code 
-	main proc
-			mov eax, [fs:30h]		    ; Pointer to PEB (https://en.wikipedia.org/wiki/Win32_Thread_Information_Block)
-			mov eax, [eax + 0ch]		; Pointer to Ldr
-			mov eax, [eax + 14h]		; Pointer to InMemoryOrderModuleList
-			mov eax, [eax]				  ; this program's module
-			mov eax, [eax]				  ; ntdll module
-			mov eax, [eax -8h + 18h]; kernel32.DllBase
-			
-			mov ebx, 0				      ; just so we can put a breakpoint on this
-	main endp
-	end main
+    main proc
+            mov eax, [fs:30h]            ; Pointer to PEB (https://en.wikipedia.org/wiki/Win32_Thread_Information_Block)
+            mov eax, [eax + 0ch]        ; Pointer to Ldr
+            mov eax, [eax + 14h]        ; Pointer to InMemoryOrderModuleList
+            mov eax, [eax]                  ; this program's module
+            mov eax, [eax]                  ; ntdll module
+            mov eax, [eax -8h + 18h]; kernel32.DllBase
+
+            mov ebx, 0                      ; just so we can put a breakpoint on this
+    main endp
+    end main
 ```
 
-Below shows a compiled and executed assembly with a highlighted eax register that points to a  memory address 76670000, which indicates that we got the base address of the kernel32 using assembly successfully:
+Below shows a compiled and executed assembly with a highlighted eax register that points to a memory address 76670000, which indicates that we got the base address of the kernel32 using assembly successfully:
 
 ![](../../.gitbook/assets/image%20%28155%29.png)
 
@@ -218,7 +218,7 @@ Below shows a compiled and executed assembly with a highlighted eax register tha
 
 Once we have the kernel32 base address, we can then loop through all the exported functions of the module to find the function we're interested in \(`WinExec`\) - or in other words - the function we want to call from the shellcode. This process requires a number of steps to be performed which are well known, so let's try and follow them alongside with some visuals and a bit of PE parsing action.
 
-See my previous lab about parsing PE files and some terminology on what is Virtual Address \(VA\) and Relative Virtual Address \(RVA\) which is used extensively in this exercise:  
+See my previous lab about parsing PE files and some terminology on what is Virtual Address \(VA\) and Relative Virtual Address \(RVA\) which is used extensively in this exercise:
 
 {% page-ref page="../../miscellaneous-reversing-forensics/pe-file-header-parser-in-c++.md" %}
 
@@ -247,7 +247,7 @@ Let's look at the kernel32.dll file offsets mentioned in the above table through
 
 Sanity checking - F8 bytes into the file does indeed contain the PE signature 4550:
 
-![](../../.gitbook/assets/image%20%28442%29.png)
+![](../../.gitbook/assets/image%20%28442%29%20%281%29.png)
 
 ### 0x78 after PE Signature
 
@@ -263,7 +263,7 @@ Export Table starts at 972c0:
 
 0x972c0 + 0x14 = 0x972d4 RVA contains a value that signifies how many functions kernel32 module exports - 0x643 in my case:
 
-![](../../.gitbook/assets/image%20%28212%29.png)
+![](../../.gitbook/assets/image%20%28212%29%20%281%29.png)
 
 ### 0x1c into the Export Table - Address Of Exported Functions
 
@@ -277,7 +277,7 @@ Indeed at 972e8 we see an RVA for the first exported function:
 
 ### 0x20 into the Export Table - Name Pointer Table
 
-0x972c0 + 0x20 = 0x972e0 RVA contains a pointer to an RVA to exported functions Name Pointer Table - 0x98bf4 in my case: 
+0x972c0 + 0x20 = 0x972e0 RVA contains a pointer to an RVA to exported functions Name Pointer Table - 0x98bf4 in my case:
 
 ![](../../.gitbook/assets/image%20%28238%29.png)
 
@@ -299,7 +299,7 @@ Again, confirming that ordinals are present at RVA 9a500:
 
 Knowing all of the above, let's try to find a `WinExec` function address manually, so we know how to implement it in assembly.
 
-Firs of, we would need to loop through the Name Pointer table, read the exported function's name and check if it is == `WinExec` and remembering how many iterations it took for us to find the function. 
+Firs of, we would need to loop through the Name Pointer table, read the exported function's name and check if it is == `WinExec` and remembering how many iterations it took for us to find the function.
 
 It would have taken 0x5ff iterations for me to find the WinExec \(0x602 - 0x3 = 0x5ff\):
 
@@ -370,7 +370,7 @@ As per the visuals earlier that showed that 0x3c into the file is a PE signature
 
 ![](../../.gitbook/assets/image%20%28442%29.png)
 
-Lines 1-13 are the same as seen earlier -  they find the kernel32 dll base address. In line 15 we move kernel32 base address to ebx holding our kernel32 base address. Then we shift that address by 3c bytes, read its contents and move it to eax. After this operation, the eax should hold the value F8, which we see it does:
+Lines 1-13 are the same as seen earlier - they find the kernel32 dll base address. In line 15 we move kernel32 base address to ebx holding our kernel32 base address. Then we shift that address by 3c bytes, read its contents and move it to eax. After this operation, the eax should hold the value F8, which we see it does:
 
 ![](../../.gitbook/assets/image%20%28150%29.png)
 
@@ -388,7 +388,7 @@ To find the address of the Export Table, we add kernel32 base address 75690000 a
 
 ![](../../.gitbook/assets/image%20%28322%29.png)
 
-###  0x14 into the Export Table - Number of Exported Functions
+### 0x14 into the Export Table - Number of Exported Functions
 
 To check if our calculations in assembly are correct at this point, we can add the Export Table address and 0x14 \(offset into the Export Table showing how many functions kernel32 module exports\) and if we cross-reference the value found there with the results we got via the visual PE parsing approach, we should have 0x643 exported functions:
 
@@ -450,7 +450,7 @@ Let's now push the remaining bytes. Remember that we need a null byte at the end
 
 #### Finding WinExec Location in Name Pointer Table
 
-After looping through the exported function Names Table and comparing each function name in there with `WinExec`, once `WinExec` is found, the loop breaks and the eax contains the number of iterations it took to find the `WinExec`. In this case it's 0x5ff - exactly the same number as previously seen when [doing this exercise manually](finding-kernel32-base-and-function-addresses-in-shellcode.md#finding-winexec-position-in-the-name-pointer-table): 
+After looping through the exported function Names Table and comparing each function name in there with `WinExec`, once `WinExec` is found, the loop breaks and the eax contains the number of iterations it took to find the `WinExec`. In this case it's 0x5ff - exactly the same number as previously seen when [doing this exercise manually](finding-kernel32-base-and-function-addresses-in-shellcode.md#finding-winexec-position-in-the-name-pointer-table):
 
 ![](../../.gitbook/assets/image%20%28144%29.png)
 
@@ -468,7 +468,7 @@ Get the `WinExec` RVA from the Export Address Table by multiplying location of t
 
 ### Finding WinExec Virtual Address
 
-We can now resolve the `WinExec` function address' location in the kernel32 dll module by adding the `WinExec` RVA 5d220 and kernel32 base address 75690000, which equals to 756ED220: 
+We can now resolve the `WinExec` function address' location in the kernel32 dll module by adding the `WinExec` RVA 5d220 and kernel32 base address 75690000, which equals to 756ED220:
 
 ![](../../.gitbook/assets/image%20%2866%29.png)
 
@@ -504,127 +504,127 @@ We used `WinExec` function in this lab, but shellcode can and usually does use t
 assume fs:nothing
 
 .code 
-	main proc
-		; form new stack frame
-		push ebp
-		mov ebp, esp
+    main proc
+        ; form new stack frame
+        push ebp
+        mov ebp, esp
 
-		; allocate local variables and initialize them to 0
-		sub esp, 1ch
-		xor eax, eax
-		mov [ebp - 04h], eax			; will store number of exported functions
-		mov [ebp - 08h], eax			; will store address of exported functions addresses table
-		mov [ebp - 0ch], eax			; will store address of exported functions name table
-		mov [ebp - 10h], eax			; will store address of exported functions ordinal table
-		mov [ebp - 14h], eax			; will store a null terminated byte string WinExec
-		mov [ebp - 18h], eax			; will store address to WinExec function
-		mov [ebp - 1ch], eax			; reserved
+        ; allocate local variables and initialize them to 0
+        sub esp, 1ch
+        xor eax, eax
+        mov [ebp - 04h], eax            ; will store number of exported functions
+        mov [ebp - 08h], eax            ; will store address of exported functions addresses table
+        mov [ebp - 0ch], eax            ; will store address of exported functions name table
+        mov [ebp - 10h], eax            ; will store address of exported functions ordinal table
+        mov [ebp - 14h], eax            ; will store a null terminated byte string WinExec
+        mov [ebp - 18h], eax            ; will store address to WinExec function
+        mov [ebp - 1ch], eax            ; reserved
 
-		; push WinExec to stack and save it to a local variable
-		push 00636578h				    ; pushing null,c,e,x
-		push 456e6957h				    ; pushing E,n,i,W
-		mov [ebp - 14h], esp			; store pointer to WinExec
+        ; push WinExec to stack and save it to a local variable
+        push 00636578h                    ; pushing null,c,e,x
+        push 456e6957h                    ; pushing E,n,i,W
+        mov [ebp - 14h], esp            ; store pointer to WinExec
 
-		; get kernel32 base address
-		mov eax, [fs:30h]		    	; Pointer to PEB (https://en.wikipedia.org/wiki/Win32_Thread_Information_Block)
-		mov eax, [eax + 0ch]			; Pointer to Ldr
-		mov eax, [eax + 14h]			; Pointer to InMemoryOrderModuleList
-		mov eax, [eax]				  	; this program's module
-		mov eax, [eax]  					; ntdll module
-		mov eax, [eax -8h + 18h]	; kernel32.DllBase
+        ; get kernel32 base address
+        mov eax, [fs:30h]                ; Pointer to PEB (https://en.wikipedia.org/wiki/Win32_Thread_Information_Block)
+        mov eax, [eax + 0ch]            ; Pointer to Ldr
+        mov eax, [eax + 14h]            ; Pointer to InMemoryOrderModuleList
+        mov eax, [eax]                      ; this program's module
+        mov eax, [eax]                      ; ntdll module
+        mov eax, [eax -8h + 18h]    ; kernel32.DllBase
 
-		; kernel32 base address
-		mov ebx, eax							; store kernel32.dll base address in ebx
+        ; kernel32 base address
+        mov ebx, eax                            ; store kernel32.dll base address in ebx
 
-		; get address of PE signature
-		mov eax, [ebx + 3ch]			; 0x3c into the image - RVA of PE signature
-		add eax, ebx				    	; address of PE signature: eax = eax + kernel32 base -> eax = 0xf8 + kernel32 base
+        ; get address of PE signature
+        mov eax, [ebx + 3ch]            ; 0x3c into the image - RVA of PE signature
+        add eax, ebx                        ; address of PE signature: eax = eax + kernel32 base -> eax = 0xf8 + kernel32 base
 
-		; get address of Export Table
-		mov eax, [eax + 78h]			; 0x78 bytes after the PE signature is an RVA of Export Table
-		add eax, ebx					    ; address of Export Table = Export Table RVA + kernel32 base
-  
-		; get number of exported functions
-		mov ecx, [eax + 14h]		
-		mov [ebp - 4h], ecx				; store number of exported functions
+        ; get address of Export Table
+        mov eax, [eax + 78h]            ; 0x78 bytes after the PE signature is an RVA of Export Table
+        add eax, ebx                        ; address of Export Table = Export Table RVA + kernel32 base
 
-		; get address of exported functions table
-		mov ecx, [eax + 1ch]			; get RVA of exported functions table
-		add ecx, ebx				    	; get address of exported functions table
-		mov [ebp - 8h], ecx				; store address of exported functions table
+        ; get number of exported functions
+        mov ecx, [eax + 14h]        
+        mov [ebp - 4h], ecx                ; store number of exported functions
 
-		; get address of name pointer table
-		mov ecx, [eax + 20h]			; get RVA of Name Pointer Table
-		add ecx, ebx					    ; get address of Name Pointer Table
-		mov [ebp - 0ch], ecx			; store address of Name Pointer Table
+        ; get address of exported functions table
+        mov ecx, [eax + 1ch]            ; get RVA of exported functions table
+        add ecx, ebx                        ; get address of exported functions table
+        mov [ebp - 8h], ecx                ; store address of exported functions table
 
-		; get address of functions ordinal table
-		mov ecx, [eax + 24h]			; get RVA of functions ordinal table
-		add ecx, ebx					    ; get address of functions ordinal table
-		mov [ebp - 10h], ecx			; store address of functions ordinal table
+        ; get address of name pointer table
+        mov ecx, [eax + 20h]            ; get RVA of Name Pointer Table
+        add ecx, ebx                        ; get address of Name Pointer Table
+        mov [ebp - 0ch], ecx            ; store address of Name Pointer Table
 
-			
-		; loop through exported function name pointer table and find position of WinExec
-		xor eax, eax
-		xor ecx, ecx
-			
-		findWinExecPosition:
-			mov esi, [ebp - 14h]		; esi = pointer to WinExec
-			mov edi, [ebp - 0ch]		; edi = pointer to exported function names table
-			cld											; https://en.wikipedia.org/wiki/Direction_flag
-			mov edi, [edi + eax*4]	; get RVA of the next function name in the exported function names table
-			add edi, ebx				    ; get address of the next function name in the exported function names table
+        ; get address of functions ordinal table
+        mov ecx, [eax + 24h]            ; get RVA of functions ordinal table
+        add ecx, ebx                        ; get address of functions ordinal table
+        mov [ebp - 10h], ecx            ; store address of functions ordinal table
 
-			mov cx, 8					      ; tell the next-comparison instruction to compare first 8 bytes
-			repe cmpsb					    ; check if esi == edi
-				
-			jz WinExecFound
-			inc eax						; increase the counter
-			cmp eax, [ebp - 4h]			; check if we have looped over all the exported function names
-			jmp findWinExecPosition	
-				
-		WinExecFound:		
-			mov ecx, [ebp - 10h]		; ecx = ordinal table
-			mov edx, [ebp - 8h]			; edx = export address table
 
-			; get address of WinExec ordinal
-			mov ax, [ecx + eax * 2]	; get WinExec ordinal
-			mov eax, [edx + eax * 4]; get RVA of WinExec function
-			add eax, ebx				    ; get VA of WinExec
+        ; loop through exported function name pointer table and find position of WinExec
+        xor eax, eax
+        xor ecx, ecx
 
-			jmp InvokeWinExec
+        findWinExecPosition:
+            mov esi, [ebp - 14h]        ; esi = pointer to WinExec
+            mov edi, [ebp - 0ch]        ; edi = pointer to exported function names table
+            cld                                            ; https://en.wikipedia.org/wiki/Direction_flag
+            mov edi, [edi + eax*4]    ; get RVA of the next function name in the exported function names table
+            add edi, ebx                    ; get address of the next function name in the exported function names table
 
-		InvokeWinExec:
-		    xor edx, edx				  ; null byte
-			push edx					
-			push 636c6163h				  ; push calc on the stack
-			mov ecx, esp			    	; ecx = calc
-	
-			push 10  					      ; uCmdSHow = SW_SHOWDEFAULT
-			push ecx								; lpCmdLine = calc
-			call eax 								; call WinExec
-			
-		; clear stack
-		add esp, 1ch							; local variables				
-		add esp, 0ch							; pushes for ebp and WinExec
-		add esp, 4h								; pushes for WinExec invokation
-		pop ebp
-		ret
-	main endp
-	end main
+            mov cx, 8                          ; tell the next-comparison instruction to compare first 8 bytes
+            repe cmpsb                        ; check if esi == edi
+
+            jz WinExecFound
+            inc eax                        ; increase the counter
+            cmp eax, [ebp - 4h]            ; check if we have looped over all the exported function names
+            jmp findWinExecPosition    
+
+        WinExecFound:        
+            mov ecx, [ebp - 10h]        ; ecx = ordinal table
+            mov edx, [ebp - 8h]            ; edx = export address table
+
+            ; get address of WinExec ordinal
+            mov ax, [ecx + eax * 2]    ; get WinExec ordinal
+            mov eax, [edx + eax * 4]; get RVA of WinExec function
+            add eax, ebx                    ; get VA of WinExec
+
+            jmp InvokeWinExec
+
+        InvokeWinExec:
+            xor edx, edx                  ; null byte
+            push edx                    
+            push 636c6163h                  ; push calc on the stack
+            mov ecx, esp                    ; ecx = calc
+
+            push 10                            ; uCmdSHow = SW_SHOWDEFAULT
+            push ecx                                ; lpCmdLine = calc
+            call eax                                 ; call WinExec
+
+        ; clear stack
+        add esp, 1ch                            ; local variables                
+        add esp, 0ch                            ; pushes for ebp and WinExec
+        add esp, 4h                                ; pushes for WinExec invokation
+        pop ebp
+        ret
+    main endp
+    end main
 ```
 
 ## References
 
-{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-peb\_ldr\_data" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-peb\_ldr\_data" caption="" %}
 
-{% embed url="https://0xevilc0de.com/locating-dll-name-from-the-process-environment-block-peb/" %}
+{% embed url="https://0xevilc0de.com/locating-dll-name-from-the-process-environment-block-peb/" caption="" %}
 
-{% embed url="https://en.wikipedia.org/wiki/Win32\_Thread\_Information\_Block" %}
+{% embed url="https://en.wikipedia.org/wiki/Win32\_Thread\_Information\_Block" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-winexec" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-winexec" caption="" %}
 
-{% embed url="https://en.wikibooks.org/wiki/X86\_Disassembly/Functions\_and\_Stack\_Frames" %}
+{% embed url="https://en.wikibooks.org/wiki/X86\_Disassembly/Functions\_and\_Stack\_Frames" caption="" %}
 
-{% embed url="https://idafchev.github.io/exploit/2017/09/26/writing\_windows\_shellcode.html" %}
+{% embed url="https://idafchev.github.io/exploit/2017/09/26/writing\_windows\_shellcode.html" caption="" %}
 

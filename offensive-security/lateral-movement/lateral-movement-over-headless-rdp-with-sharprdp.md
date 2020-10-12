@@ -24,7 +24,5 @@ Also, weird binaries making connections to port 3389:
 
 ## References
 
-{% embed url="https://posts.specterops.io/revisiting-remote-desktop-lateral-movement-8fb905cb46c3?gi=fe80458d82a5" %}
-
-
+{% embed url="https://posts.specterops.io/revisiting-remote-desktop-lateral-movement-8fb905cb46c3?gi=fe80458d82a5" caption="" %}
 

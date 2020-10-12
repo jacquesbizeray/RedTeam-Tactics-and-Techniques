@@ -2,7 +2,7 @@
 
 RID \(Relative ID, part of the SID \(Security Identifier\)\) hijacking is a persistence technique, where an attacker with SYSTEM level privileges assigns an RID 500 \(default Windows administrator account\) to some low privileged user, effectively making the low privileged account assume administrator privileges on the next logon.
 
-This techniques was originally researched by [Sebastian Castro](https://twitter.com/r4wd3r) -   [https://r4wsecurity.blogspot.com/2017/12/rid-hijacking-maintaining-access-on.html](https://r4wsecurity.blogspot.com/2017/12/rid-hijacking-maintaining-access-on.html)
+This techniques was originally researched by [Sebastian Castro](https://twitter.com/r4wd3r) - [https://r4wsecurity.blogspot.com/2017/12/rid-hijacking-maintaining-access-on.html](https://r4wsecurity.blogspot.com/2017/12/rid-hijacking-maintaining-access-on.html)
 
 ## Execution
 
@@ -12,7 +12,7 @@ Below shows that the user `hijacked` is a low privileged user and has an RID of 
 
 ![](../../.gitbook/assets/image%20%28427%29.png)
 
-If we try to write something to c:\windows\ with the user `hijacked`, as expected, we get `Access is Denied`:
+If we try to write something to c:\windows with the user `hijacked`, as expected, we get `Access is Denied`:
 
 ![](../../.gitbook/assets/image%20%28132%29.png)
 
@@ -40,5 +40,5 @@ Monitor HKEY\_LOCAL\_MACHINE\SAM\SAM\Domains\Account\Users\\*\F for modification
 
 ## References
 
-{% embed url="https://r4wsecurity.blogspot.com/2017/12/rid-hijacking-maintaining-access-on.html" %}
+{% embed url="https://r4wsecurity.blogspot.com/2017/12/rid-hijacking-maintaining-access-on.html" caption="" %}
 

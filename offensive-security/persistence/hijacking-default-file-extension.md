@@ -2,7 +2,7 @@
 
 When a .txt file is double clicked, it's opened with a notepad.exe. Windows knows that it needs to use notepad.exe for opening txt files, because the `.txt` extension \(among many others\) are mapped to applictions that can open those files in Windows registry located at `Computer\HKEY_CLASSES_ROOT`.
 
-It's possible to hijack a file extension and make it execute a malicious application before the actual file is opened. 
+It's possible to hijack a file extension and make it execute a malicious application before the actual file is opened.
 
 In this quick lab, I'm going to hijack the .txt extension - the victim user will still be able to open the original .txt file, but it will additionally fire a reverse shell back to the attacking system.
 
@@ -35,7 +35,7 @@ start notepad.exe %1
 
 Once executed, `c:\tools\hell.cmd` will launch a simple netcat reverse shell to the attacking system and also a notepad with the `test.txt` file as an argument.
 
-We are now ready to hijack the .txt file extension by modifying the value data of  `Computer\HKEY_CLASSES_ROOT\txtfile\shell\open\command` to `c:\tools\shell.cmd %1` as shown below:
+We are now ready to hijack the .txt file extension by modifying the value data of `Computer\HKEY_CLASSES_ROOT\txtfile\shell\open\command` to `c:\tools\shell.cmd %1` as shown below:
 
 ![](../../.gitbook/assets/image%20%28429%29.png)
 
@@ -51,5 +51,5 @@ Defenders may want to monitor registry for file extension command changes, espec
 
 ## References
 
-{% embed url="https://attack.mitre.org/techniques/T1042/" %}
+{% embed url="https://attack.mitre.org/techniques/T1042/" caption="" %}
 

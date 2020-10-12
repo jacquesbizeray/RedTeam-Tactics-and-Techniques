@@ -2,7 +2,7 @@
 
 It's possible to enumerate all open handles \(processes, files, mutexes, keys, sections, etc\) on a system \(no admin rights required\), which means it is possible to get a virtual address of any kernel object \(for example `EPROCESS` for a process object\) in the kernel space from user space.
 
-Being able to locate a virtual address of a kernel object \(like `EPROCESS`\) is useful in kernel exploitation. For example, if you compromise a machine and discover there is a vulnerable driver, through which you  can read/write kernel memory from userland, you could exploit it for privilege escalation by locating a kernel object `EPROCESS` of a privileged process, for example `winlogon.exe`, stealing its security token and applying it to your low privileged `cmd.exe` process to gain a shell with `SYSTEM` privileges.
+Being able to locate a virtual address of a kernel object \(like `EPROCESS`\) is useful in kernel exploitation. For example, if you compromise a machine and discover there is a vulnerable driver, through which you can read/write kernel memory from userland, you could exploit it for privilege escalation by locating a kernel object `EPROCESS` of a privileged process, for example `winlogon.exe`, stealing its security token and applying it to your low privileged `cmd.exe` process to gain a shell with `SYSTEM` privileges.
 
 A list of all the open handles on the system is retrieved by using a `NtQuerySystemInformation` API and a couple of undocumented, but well known structures `SYSTEM_HANDLE_INFORMATION` and `SYSTEM_HANDLE_TABLE_ENTRY_INFO`.
 
@@ -135,11 +135,11 @@ dt _eprocess ffff8f077c882300 uniqueprocessid imagefilename
 
 ## References
 
-{% embed url="https://processhacker.sourceforge.io/doc/struct\_\_\_s\_y\_s\_t\_e\_m\_\_\_h\_a\_n\_d\_l\_e\_\_\_i\_n\_f\_o\_r\_m\_a\_t\_i\_o\_n.html" %}
+{% embed url="https://processhacker.sourceforge.io/doc/struct\_\_\_s\_y\_s\_t\_e\_m\_\_\_h\_a\_n\_d\_l\_e\_\_\_i\_n\_f\_o\_r\_m\_a\_t\_i\_o\_n.html" caption="" %}
 
-{% embed url="https://www.geoffchappell.com/studies/windows/km/ntoskrnl/api/ex/sysinfo/handle.htm" %}
+{% embed url="https://www.geoffchappell.com/studies/windows/km/ntoskrnl/api/ex/sysinfo/handle.htm" caption="" %}
 
-{% embed url="https://www.geoffchappell.com/studies/windows/km/ntoskrnl/api/ex/sysinfo/handle\_table\_entry.htm?ts=0,81" %}
+{% embed url="https://www.geoffchappell.com/studies/windows/km/ntoskrnl/api/ex/sysinfo/handle\_table\_entry.htm?ts=0,81" caption="" %}
 
-{% embed url="https://blez.wordpress.com/2012/09/17/enumerating-opened-handles-from-a-process/" %}
+{% embed url="https://blez.wordpress.com/2012/09/17/enumerating-opened-handles-from-a-process/" caption="" %}
 

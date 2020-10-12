@@ -14,11 +14,11 @@ Default Password is a currently logged on user's password.
 
 ![](../../.gitbook/assets/annotation-2019-08-20-224950.png)
 
-If the Credentials Delegation was enabled as shown below: 
+If the Credentials Delegation was enabled as shown below:
 
 ![](../../.gitbook/assets/annotation-2019-08-20-225941.png)
 
-...the machines that are running a termsrv \(RDP\) service would now be allowed to authenticate users who are delegating their credentials. 
+...the machines that are running a termsrv \(RDP\) service would now be allowed to authenticate users who are delegating their credentials.
 
 Below shows how the same user spotless is attempting to connect to RDP on ws02 and gets authenticated immediately without being prompted for the password - this means that the user's credenentials were delegated and the termsrv/ws2.offense.local accepted them due to the GPO change we described earlier whereby Credential Delegation was enabled:
 
@@ -148,7 +148,7 @@ reg delete HKLM\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation /f
 
 ## References
 
-{% embed url="https://clement.notin.org/blog/2019/07/03/credential-theft-without-admin-or-touching-lsass-with-kekeo-by-abusing-credssp-tspkg-rdp-sso/" %}
+{% embed url="https://clement.notin.org/blog/2019/07/03/credential-theft-without-admin-or-touching-lsass-with-kekeo-by-abusing-credssp-tspkg-rdp-sso/" caption="" %}
 
-{% embed url="https://github.com/PowerShell/GPRegistryPolicyParser" %}
+{% embed url="https://github.com/PowerShell/GPRegistryPolicyParser" caption="" %}
 

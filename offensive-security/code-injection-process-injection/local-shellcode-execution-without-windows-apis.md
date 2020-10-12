@@ -57,7 +57,7 @@ After compiling the above code and inspecting the `.text` section of the PE, we 
 
 ## References
 
-{% embed url="https://docs.microsoft.com/en-us/cpp/preprocessor/section?view=vs-2019" %}
+{% embed url="https://docs.microsoft.com/en-us/cpp/preprocessor/section?view=vs-2019" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/cpp/cpp/allocate?view=vs-2019" %}
+{% embed url="https://docs.microsoft.com/en-us/cpp/cpp/allocate?view=vs-2019" caption="" %}
 

@@ -2,7 +2,7 @@
 
 This is a quick lab to test a DLL injection technique discovered by [@am0nsec](https://twitter.com/am0nsec), which he describes in his blogpost [https://www.contextis.com/us/blog/bring-your-own-.net-core-garbage-collector](https://www.contextis.com/us/blog/bring-your-own-.net-core-garbage-collector) - go check it out!
 
-The idea behind this technique is that a low privileged user can specify a custom Garbage Collector \(GC\), that a  .NET application should use. A custom GC can be specified by setting a command shell environment variable `COMPLUS_GCName`, that points to a malicious DLL which represents a custom Garbage Collector.
+The idea behind this technique is that a low privileged user can specify a custom Garbage Collector \(GC\), that a .NET application should use. A custom GC can be specified by setting a command shell environment variable `COMPLUS_GCName`, that points to a malicious DLL which represents a custom Garbage Collector.
 
 {% hint style="warning" %}
 Normally, specifying a custom GC requires administartor privileges, however, since path to a custom GC in `COMPLUS_GCName` is not sanitized when a custom GC is loaded, directory traversal allows **any** unprivileged user to specify a custom GC to be loaded from an arbitrary location to which they can drop their DLL.
@@ -69,5 +69,5 @@ Below shows that our GC.dll got injected into the dotnet.exe:
 
 ## References
 
-{% embed url="https://www.contextis.com/us/blog/bring-your-own-.net-core-garbage-collector" %}
+{% embed url="https://www.contextis.com/us/blog/bring-your-own-.net-core-garbage-collector" caption="" %}
 

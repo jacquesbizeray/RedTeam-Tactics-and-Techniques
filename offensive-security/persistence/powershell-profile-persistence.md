@@ -33,5 +33,5 @@ If the user is not using profiles, the technique will stick out immediately due 
 
 ## References
 
-{% embed url="https://attack.mitre.org/techniques/T1504/" %}
+{% embed url="https://attack.mitre.org/techniques/T1504/" caption="" %}
 

@@ -46,5 +46,5 @@ Loading the malicious helper DLL crashed netsh. Inspecting the calc.exe process 
 
 ## References
 
-{% embed url="https://attack.mitre.org/wiki/Technique/T1128" %}
+{% embed url="https://attack.mitre.org/wiki/Technique/T1128" caption="" %}
 

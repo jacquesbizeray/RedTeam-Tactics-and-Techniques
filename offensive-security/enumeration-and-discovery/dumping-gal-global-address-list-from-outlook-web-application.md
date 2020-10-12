@@ -53,7 +53,5 @@ curl 'https://dc01/owa/service.svc?action=FindPeople' -X POST -H 'Cookie: X-Back
 
 [https://www.blackhillsinfosec.com/attacking-exchange-with-mailsniper/](https://www.blackhillsinfosec.com/attacking-exchange-with-mailsniper/)
 
-{% embed url="https://www.blackhillsinfosec.com/downloading-an-address-book-from-an-outlook-web-app-owa-portal/" %}
-
-
+{% embed url="https://www.blackhillsinfosec.com/downloading-an-address-book-from-an-outlook-web-app-owa-portal/" caption="" %}
 

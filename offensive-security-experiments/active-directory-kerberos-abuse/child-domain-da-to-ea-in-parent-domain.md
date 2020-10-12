@@ -102,7 +102,7 @@ The domain user is of interest, so we would use a `usemodule situational_awarene
 
 ### Token Manipulation
 
-Let's steal the token of a process with PID 4900 that runs with `red\spotless` credentials: 
+Let's steal the token of a process with PID 4900 that runs with `red\spotless` credentials:
 
 ![](../../.gitbook/assets/empire-stealtoken.png)
 
@@ -217,15 +217,15 @@ For the sake of fun and wrapping this lab up, let's get an agent from the `dc-ma
 
 ## References
 
-{% embed url="https://enigma0x3.net/2016/01/28/an-empire-case-study/" %}
+{% embed url="https://enigma0x3.net/2016/01/28/an-empire-case-study/" caption="" %}
 
-{% embed url="http://www.harmj0y.net/blog/redteaming/trusts-you-might-have-missed/" %}
+{% embed url="http://www.harmj0y.net/blog/redteaming/trusts-you-might-have-missed/" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc731404\(v%3dws.10\)" %}
+{% embed url="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-R2-and-2008/cc731404\(v%3dws.10\)" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adtrust?view=winserver2012-ps" %}
+{% embed url="https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adtrust?view=winserver2012-ps" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc759554\(v=ws.10\)" %}
+{% embed url="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc759554\(v=ws.10\)" caption="" %}
 
-{% embed url="https://support.microsoft.com/en-gb/help/243330/well-known-security-identifiers-in-windows-operating-systems" %}
+{% embed url="https://support.microsoft.com/en-gb/help/243330/well-known-security-identifiers-in-windows-operating-systems" caption="" %}
 

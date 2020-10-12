@@ -37,13 +37,13 @@ kd> !idt
 
 Dumping IDT: fffff80091456000
 
-00:	fffff8008f37e100 nt!KiDivideErrorFaultShadow
-01:	fffff8008f37e180 nt!KiDebugTrapOrFaultShadow	Stack = 0xFFFFF8009145A9E0
-02:	fffff8008f37e200 nt!KiNmiInterruptShadow	Stack = 0xFFFFF8009145A7E0
-03:	fffff8008f37e280 nt!KiBreakpointTrapShadow
+00:    fffff8008f37e100 nt!KiDivideErrorFaultShadow
+01:    fffff8008f37e180 nt!KiDebugTrapOrFaultShadow    Stack = 0xFFFFF8009145A9E0
+02:    fffff8008f37e200 nt!KiNmiInterruptShadow    Stack = 0xFFFFF8009145A7E0
+03:    fffff8008f37e280 nt!KiBreakpointTrapShadow
 ...
-90:	fffff8008f37f680 i8042prt!I8042MouseInterruptService (KINTERRUPT ffffd4816353e8c0)
-a0:	fffff8008f37f700 i8042prt!I8042KeyboardInterruptService (KINTERRUPT ffffd4816353ea00)
+90:    fffff8008f37f680 i8042prt!I8042MouseInterruptService (KINTERRUPT ffffd4816353e8c0)
+a0:    fffff8008f37f700 i8042prt!I8042KeyboardInterruptService (KINTERRUPT ffffd4816353ea00)
 ...
 ```
 
@@ -53,11 +53,11 @@ Below shows the IDT dumping and ISR code execution in action:
 * IRS entry point for the interrupt `a0` is located at `fffff8008f37f700`
   * This is the routine that gets executed first inside the kernel when a keyboard event such as a keypress is registered on the OS 
   * Eventually, the routine `i8042prt!I8042KeyboardInterruptService` \(inside the actual keyboard driver\) is hit once the code at `fffff8008f37f700` is finished
-* Putting a breakpoint on 
+* Putting a breakpoint on
 
   `i8042prt!I8042KeyboardInterruptService`
 
-* Once the breakpoint is set, a key is pressed on the OS login prompt and our breakpoint is hit, confirming that 
+* Once the breakpoint is set, a key is pressed on the OS login prompt and our breakpoint is hit, confirming that
 
   `i8042prt!I8042KeyboardInterruptService` indeed handles keyboard interrupts
 
@@ -171,7 +171,7 @@ As an example - from earlier, we know that the ISR for keyboard interrupts is lo
 dt nt!_KINTERRUPT ffffd4816353ea00
 ```
 
-This allows us to confirm that the `ServiceRoutine` is again pointing correctly to `i8042prt!I8042KeyboardInterruptService` inside the keyboard driver: 
+This allows us to confirm that the `ServiceRoutine` is again pointing correctly to `i8042prt!I8042KeyboardInterruptService` inside the keyboard driver:
 
 ![](../../.gitbook/assets/image%20%28520%29.png)
 
@@ -222,15 +222,15 @@ Evaluate expression: -8781847822336 = fffff803`51148000
 kd> !pcr
 KPCR for Processor 0 at fffff80351148000:
     Major 1 Minor 1
-	NtTib.ExceptionList: fffff803536dffb0
-	    NtTib.StackBase: fffff803536de000
-	   NtTib.StackLimit: 0000000000000000
+    NtTib.ExceptionList: fffff803536dffb0
+        NtTib.StackBase: fffff803536de000
+       NtTib.StackLimit: 0000000000000000
 ...snip...
 ```
 
 Inside the `_KPCR`, at offset `0x180` there is a member that points to a Process Control Block memory structure `_KPRCB` which contains information about the state of a processor.
 
-The key member we're interested when trying to find the `_KINTERRUPT` memory location for a given interrupt is `InterruptObject` as it contains a list of pointers to a list of `_KINTERRUPT` objects.  `InterrupObject` is located at offset `0x2e80` as shown below:
+The key member we're interested when trying to find the `_KINTERRUPT` memory location for a given interrupt is `InterruptObject` as it contains a list of pointers to a list of `_KINTERRUPT` objects. `InterrupObject` is located at offset `0x2e80` as shown below:
 
 ```erlang
 kd> dt _KPRCB
@@ -255,21 +255,21 @@ Below confirms that the `_KINTERRUPT` for the interrupt `a0` we found manually m
 
 ## References
 
-{% embed url="https://nagareshwar.securityxploded.com/2014/03/20/code-injection-and-api-hooking-techniques/" %}
+{% embed url="https://nagareshwar.securityxploded.com/2014/03/20/code-injection-and-api-hooking-techniques/" caption="" %}
 
-{% embed url="https://www.linux.com/tutorials/kernel-interrupt-overview/" %}
+{% embed url="https://www.linux.com/tutorials/kernel-interrupt-overview/" caption="" %}
 
-{% embed url="https://en.wikipedia.org/wiki/Interrupt\_handler" %}
+{% embed url="https://en.wikipedia.org/wiki/Interrupt\_handler" caption="" %}
 
-{% embed url="https://relearex.wordpress.com/2017/12/27/hooking-series-part-ii-interrupt-descriptor-table-hooking/" %}
+{% embed url="https://relearex.wordpress.com/2017/12/27/hooking-series-part-ii-interrupt-descriptor-table-hooking/" caption="" %}
 
-{% embed url="https://wiki.osdev.org/Interrupt\_Descriptor\_Table" %}
+{% embed url="https://wiki.osdev.org/Interrupt\_Descriptor\_Table" caption="" %}
 
-{% embed url="https://www.codemachine.com/article\_interruptdispatching.html" %}
+{% embed url="https://www.codemachine.com/article\_interruptdispatching.html" caption="" %}
 
-{% embed url="https://www.linux.com/tutorials/kernel-interrupt-overview/" %}
+{% embed url="https://www.linux.com/tutorials/kernel-interrupt-overview/" caption="" %}
 
-{% embed url="https://rayanfam.com/topics/fooling-windows-about-cpu/" %}
+{% embed url="https://rayanfam.com/topics/fooling-windows-about-cpu/" caption="" %}
 
-{% embed url="https://resources.infosecinstitute.com/hooking-idt/\#gref" %}
+{% embed url="https://resources.infosecinstitute.com/hooking-idt/\#gref" caption="" %}
 

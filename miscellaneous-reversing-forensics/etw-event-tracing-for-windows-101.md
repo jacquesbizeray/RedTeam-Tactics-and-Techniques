@@ -39,7 +39,7 @@ logman query providers "{22FB2CD6-0E7B-422B-A0C7-2FAD1FD0E716}"
 As we can tell from the above `keywords`, this provider could provide us with some process, thread and image \(load/unload as we will see later\) related events.
 
 {% hint style="info" %}
-Use [ETWExplorer](https://github.com/zodiacon/EtwExplorer) for a deep provider inspection, and see what events and more importantly data it can provide. 
+Use [ETWExplorer](https://github.com/zodiacon/EtwExplorer) for a deep provider inspection, and see what events and more importantly data it can provide.
 {% endhint %}
 
 Below shows Microsoft-Windows-Kernel-Process being inspected with ETWExplorer with some information, which looks like something Sysmon and other similar security monitoring oriented tools could use:
@@ -92,7 +92,7 @@ logman query spotless-tracing -ets
 
 ### Checking the .etl Log
 
-After the tracing session has run for some time, we can check the log file  by opening it with the Windows Event Viewer.
+After the tracing session has run for some time, we can check the log file by opening it with the Windows Event Viewer.
 
 We can see process creation events \(event ID 1\):
 
@@ -144,7 +144,7 @@ logman query providers -pid $pid
 
 ## Consuming Events via Code
 
-Thanks to [Pavel Yosifovich](https://github.com/zodiacon), we can use the below C\# code to subscribe to a kernel provider, that will feed our console program with process related events: 
+Thanks to [Pavel Yosifovich](https://github.com/zodiacon), we can use the below C\# code to subscribe to a kernel provider, that will feed our console program with process related events:
 
 ```csharp
 # code by Pavel Yosifovich, https://github.com/zodiacon/DotNextSP2019/blob/master/SimpleKernelConsumer/Program.cs
@@ -160,55 +160,55 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleKernelConsumer {
-	class ProcessInfo {
-		public int Id { get; set; }
-		public string Name { get; set; }
-	}
+    class ProcessInfo {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
 
-	class Program {
-		static void Main(string[] args) {
-			var processes = Process.GetProcesses().Select(p => new ProcessInfo {
-				Name = p.ProcessName,
-				Id = p.Id
-			}).ToDictionary(p => p.Id);
+    class Program {
+        static void Main(string[] args) {
+            var processes = Process.GetProcesses().Select(p => new ProcessInfo {
+                Name = p.ProcessName,
+                Id = p.Id
+            }).ToDictionary(p => p.Id);
 
-			using (var session = new TraceEventSession(Environment.OSVersion.Version.Build >= 9200 ? "MyKernelSession" : KernelTraceEventParser.KernelSessionName)) {
-				session.EnableKernelProvider(KernelTraceEventParser.Keywords.Process | KernelTraceEventParser.Keywords.ImageLoad);
-				var parser = session.Source.Kernel;
+            using (var session = new TraceEventSession(Environment.OSVersion.Version.Build >= 9200 ? "MyKernelSession" : KernelTraceEventParser.KernelSessionName)) {
+                session.EnableKernelProvider(KernelTraceEventParser.Keywords.Process | KernelTraceEventParser.Keywords.ImageLoad);
+                var parser = session.Source.Kernel;
 
-				parser.ProcessStart += e => {
-					Console.ForegroundColor = ConsoleColor.Green;
-					Console.WriteLine($"{e.TimeStamp}.{e.TimeStamp.Millisecond:D3}: Process {e.ProcessID} ({e.ProcessName}) Created by {e.ParentID}: {e.CommandLine}");
-					processes.Add(e.ProcessID, new ProcessInfo { Id = e.ProcessID, Name = e.ProcessName });
-				};
-				parser.ProcessStop += e => {
-					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine($"{e.TimeStamp}.{e.TimeStamp.Millisecond:D3}: Process {e.ProcessID} {TryGetProcessName(e)} Exited");
-				};
+                parser.ProcessStart += e => {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"{e.TimeStamp}.{e.TimeStamp.Millisecond:D3}: Process {e.ProcessID} ({e.ProcessName}) Created by {e.ParentID}: {e.CommandLine}");
+                    processes.Add(e.ProcessID, new ProcessInfo { Id = e.ProcessID, Name = e.ProcessName });
+                };
+                parser.ProcessStop += e => {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"{e.TimeStamp}.{e.TimeStamp.Millisecond:D3}: Process {e.ProcessID} {TryGetProcessName(e)} Exited");
+                };
 
-				parser.ImageLoad += e => {
-					Console.ForegroundColor = ConsoleColor.Yellow;
-					var name = TryGetProcessName(e);
-					Console.WriteLine($"{e.TimeStamp}.{e.TimeStamp.Millisecond:D3}: Image Loaded: {e.FileName} into process {e.ProcessID} ({name}) Size=0x{e.ImageSize:X}");
-				};
+                parser.ImageLoad += e => {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    var name = TryGetProcessName(e);
+                    Console.WriteLine($"{e.TimeStamp}.{e.TimeStamp.Millisecond:D3}: Image Loaded: {e.FileName} into process {e.ProcessID} ({name}) Size=0x{e.ImageSize:X}");
+                };
 
-				parser.ImageUnload += e => {
-					Console.ForegroundColor = ConsoleColor.DarkYellow;
-					var name = TryGetProcessName(e);
-					Console.WriteLine($"{e.TimeStamp}.{e.TimeStamp.Millisecond:D3}: Image Unloaded: {e.FileName} from process {e.ProcessID} ({name})");
-				};
+                parser.ImageUnload += e => {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    var name = TryGetProcessName(e);
+                    Console.WriteLine($"{e.TimeStamp}.{e.TimeStamp.Millisecond:D3}: Image Unloaded: {e.FileName} from process {e.ProcessID} ({name})");
+                };
 
-				Task.Run(() => session.Source.Process());
-				Thread.Sleep(TimeSpan.FromSeconds(60));
-			}
+                Task.Run(() => session.Source.Process());
+                Thread.Sleep(TimeSpan.FromSeconds(60));
+            }
 
-			string TryGetProcessName(TraceEvent evt) {
-				if (!string.IsNullOrEmpty(evt.ProcessName))
-					return evt.ProcessName;
-				return processes.TryGetValue(evt.ProcessID, out var info) ? info.Name : string.Empty;
-			}
-		}
-	}
+            string TryGetProcessName(TraceEvent evt) {
+                if (!string.IsNullOrEmpty(evt.ProcessName))
+                    return evt.ProcessName;
+                return processes.TryGetValue(evt.ProcessID, out var info) ? info.Name : string.Empty;
+            }
+        }
+    }
 }
 ```
 
@@ -231,15 +231,13 @@ From a defender's perspective, you may want to:
 
 ## References
 
-{% embed url="https://docs.microsoft.com/en-us/windows/win32/etw/about-event-tracing" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/win32/etw/about-event-tracing" caption="" %}
 
-{% embed url="https://medium.com/palantir/tampering-with-windows-event-tracing-background-offense-and-defense-4be7ac62ac63" %}
+{% embed url="https://medium.com/palantir/tampering-with-windows-event-tracing-background-offense-and-defense-4be7ac62ac63" caption="" %}
 
-{% embed url="https://github.com/zodiacon/EtwExplorer" %}
+{% embed url="https://github.com/zodiacon/EtwExplorer" caption="" %}
 
 [Microsoft-Windows-Threat-Intelligence](https://pastebin.com/6VGHjGjH) Provider Manifest as [mentioned](https://twitter.com/FancyCyber/status/1267536407272345602) by @FancyCyber:
 
 ![](../.gitbook/assets/image%20%28537%29.png)
-
-
 

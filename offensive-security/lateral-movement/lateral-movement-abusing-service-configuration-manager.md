@@ -24,5 +24,5 @@ From the defensive side, you may want to consider about monitoring services that
 
 ## References
 
-{% embed url="https://github.com/Mr-Un1k0d3r/SCShell" %}
+{% embed url="https://github.com/Mr-Un1k0d3r/SCShell" caption="" %}
 

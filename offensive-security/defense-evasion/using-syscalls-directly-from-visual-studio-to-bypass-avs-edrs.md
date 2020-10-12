@@ -33,12 +33,12 @@ In the `syscalls.asm`, let's define a procedure `SysNtCreateFile` with a syscall
 {% code title="syscalls.asm" %}
 ```csharp
 .code
-	SysNtCreateFile proc
-			mov r10, rcx
-			mov eax, 55h
-			syscall
-			ret
-	SysNtCreateFile endp
+    SysNtCreateFile proc
+            mov r10, rcx
+            mov eax, 55h
+            syscall
+            ret
+    SysNtCreateFile endp
 end
 ```
 {% endcode %}
@@ -66,17 +66,17 @@ Once we have the `SysNtCreateFile` procedure defined in assembly, we need to def
 // calling convention - Important!
 
 EXTERN_C NTSTATUS SysNtCreateFile(
-	PHANDLE FileHandle, 
-	ACCESS_MASK DesiredAccess, 
-	POBJECT_ATTRIBUTES ObjectAttributes, 
-	PIO_STATUS_BLOCK IoStatusBlock, 
-	PLARGE_INTEGER AllocationSize, 
-	ULONG FileAttributes, 
-	ULONG ShareAccess, 
-	ULONG CreateDisposition, 
-	ULONG CreateOptions, 
-	PVOID EaBuffer, 
-	ULONG EaLength
+    PHANDLE FileHandle, 
+    ACCESS_MASK DesiredAccess, 
+    POBJECT_ATTRIBUTES ObjectAttributes, 
+    PIO_STATUS_BLOCK IoStatusBlock, 
+    PLARGE_INTEGER AllocationSize, 
+    ULONG FileAttributes, 
+    ULONG ShareAccess, 
+    ULONG CreateDisposition, 
+    ULONG CreateOptions, 
+    PVOID EaBuffer, 
+    ULONG EaLength
 );
 ```
 
@@ -98,17 +98,17 @@ Once the variables and structures are initialized, we are ready to invoke the `S
 
 ```cpp
 SysNtCreateFile(
-	&fileHandle, 
-	FILE_GENERIC_WRITE, 
-	&oa, 
-	&osb, 
-	0, 
-	FILE_ATTRIBUTE_NORMAL, 
-	FILE_SHARE_WRITE, 
-	FILE_OVERWRITE_IF, 
-	FILE_SYNCHRONOUS_IO_NONALERT, 
-	NULL, 
-	0
+    &fileHandle, 
+    FILE_GENERIC_WRITE, 
+    &oa, 
+    &osb, 
+    0, 
+    FILE_ATTRIBUTE_NORMAL, 
+    FILE_SHARE_WRITE, 
+    FILE_OVERWRITE_IF, 
+    FILE_SYNCHRONOUS_IO_NONALERT, 
+    NULL, 
+    0
 );
 ```
 
@@ -134,55 +134,55 @@ What this all means is that if an AV/EDR product had hooked `NtCreateFile` API c
 #pragma comment(lib, "ntdll")
 
 EXTERN_C NTSTATUS SysNtCreateFile(
-	PHANDLE FileHandle, 
-	ACCESS_MASK DesiredAccess, 
-	POBJECT_ATTRIBUTES ObjectAttributes, 
-	PIO_STATUS_BLOCK IoStatusBlock, 
-	PLARGE_INTEGER AllocationSize, 
-	ULONG FileAttributes, 
-	ULONG ShareAccess, 
-	ULONG CreateDisposition, 
-	ULONG CreateOptions, 
-	PVOID EaBuffer, 
-	ULONG EaLength);
+    PHANDLE FileHandle, 
+    ACCESS_MASK DesiredAccess, 
+    POBJECT_ATTRIBUTES ObjectAttributes, 
+    PIO_STATUS_BLOCK IoStatusBlock, 
+    PLARGE_INTEGER AllocationSize, 
+    ULONG FileAttributes, 
+    ULONG ShareAccess, 
+    ULONG CreateDisposition, 
+    ULONG CreateOptions, 
+    PVOID EaBuffer, 
+    ULONG EaLength);
 
 int main()
 {
-	FARPROC addr = GetProcAddress(LoadLibraryA("ntdll"), "NtCreateFile");
-	
-	OBJECT_ATTRIBUTES oa;
-	HANDLE fileHandle = NULL;
-	NTSTATUS status = NULL;
-	UNICODE_STRING fileName;
-	IO_STATUS_BLOCK osb;
+    FARPROC addr = GetProcAddress(LoadLibraryA("ntdll"), "NtCreateFile");
 
-	RtlInitUnicodeString(&fileName, (PCWSTR)L"\\??\\c:\\temp\\test.txt");
-	ZeroMemory(&osb, sizeof(IO_STATUS_BLOCK));
-	InitializeObjectAttributes(&oa, &fileName, OBJ_CASE_INSENSITIVE, NULL, NULL);
+    OBJECT_ATTRIBUTES oa;
+    HANDLE fileHandle = NULL;
+    NTSTATUS status = NULL;
+    UNICODE_STRING fileName;
+    IO_STATUS_BLOCK osb;
 
-	SysNtCreateFile(
-		&fileHandle, 
-		FILE_GENERIC_WRITE, 
-		&oa, 
-		&osb, 
-		0, 
-		FILE_ATTRIBUTE_NORMAL, 
-		FILE_SHARE_WRITE, 
-		FILE_OVERWRITE_IF, 
-		FILE_SYNCHRONOUS_IO_NONALERT, 
-		NULL, 
-		0);
+    RtlInitUnicodeString(&fileName, (PCWSTR)L"\\??\\c:\\temp\\test.txt");
+    ZeroMemory(&osb, sizeof(IO_STATUS_BLOCK));
+    InitializeObjectAttributes(&oa, &fileName, OBJ_CASE_INSENSITIVE, NULL, NULL);
 
-	return 0;
+    SysNtCreateFile(
+        &fileHandle, 
+        FILE_GENERIC_WRITE, 
+        &oa, 
+        &osb, 
+        0, 
+        FILE_ATTRIBUTE_NORMAL, 
+        FILE_SHARE_WRITE, 
+        FILE_OVERWRITE_IF, 
+        FILE_SYNCHRONOUS_IO_NONALERT, 
+        NULL, 
+        0);
+
+    return 0;
 }
 ```
 {% endcode %}
 
 ## References
 
-{% embed url="https://outflank.nl/blog/2019/06/19/red-team-tactics-combining-direct-system-calls-and-srdi-to-bypass-av-edr/" %}
+{% embed url="https://outflank.nl/blog/2019/06/19/red-team-tactics-combining-direct-system-calls-and-srdi-to-bypass-av-edr/" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntcreatefile" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntcreatefile" caption="" %}
 
-{% embed url="https://j00ru.vexillium.org/syscalls/nt/64/" %}
+{% embed url="https://j00ru.vexillium.org/syscalls/nt/64/" caption="" %}
 

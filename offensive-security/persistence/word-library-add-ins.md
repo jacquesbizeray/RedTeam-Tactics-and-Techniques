@@ -52,7 +52,7 @@ This technique did not work for me on Office 365 version, but worked on Office P
 
 ## References
 
-{% embed url="https://www.mdsec.co.uk/2019/05/persistence-the-continued-or-prolonged-existence-of-something-part-1-microsoft-office/" %}
+{% embed url="https://www.mdsec.co.uk/2019/05/persistence-the-continued-or-prolonged-existence-of-something-part-1-microsoft-office/" caption="" %}
 
-{% embed url="https://labs.mwrinfosecurity.com/blog/add-in-opportunities-for-office-persistence/" %}
+{% embed url="https://labs.mwrinfosecurity.com/blog/add-in-opportunities-for-office-persistence/" caption="" %}
 

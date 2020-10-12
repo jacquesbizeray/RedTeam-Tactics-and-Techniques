@@ -24,7 +24,7 @@ We are now reconnected to the `spotless` session:
 
 ![](../../.gitbook/assets/rdp-spotless.png)
 
-Now this is where it gets interesting. It is possible to reconnect to a users session without knowing their password if you have `SYSTEM` level privileges on the system.   
+Now this is where it gets interesting. It is possible to reconnect to a users session without knowing their password if you have `SYSTEM` level privileges on the system.  
 Let's elevate to `SYSTEM` using psexec \(privilege escalation exploits, service creation or any other technique will also do\):
 
 ```text
@@ -67,13 +67,11 @@ Just reinforcing the above - note the usernames and logon session IDs:
 
 ## References
 
-{% embed url="http://blog.gentilkiwi.com/securite/vol-de-session-rdp" %}
+{% embed url="http://blog.gentilkiwi.com/securite/vol-de-session-rdp" caption="" %}
 
-{% embed url="http://www.korznikov.com/2017/03/0-day-or-feature-privilege-escalation.html" %}
+{% embed url="http://www.korznikov.com/2017/03/0-day-or-feature-privilege-escalation.html" caption="" %}
 
-{% embed url="https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4778" %}
+{% embed url="https://www.ultimatewindowssecurity.com/securitylog/encyclopedia/event.aspx?eventID=4778" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tscon" %}
-
-
+{% embed url="https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tscon" caption="" %}
 

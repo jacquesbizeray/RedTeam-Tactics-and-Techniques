@@ -1,6 +1,6 @@
 # Injecting .NET Assembly to an Unmanaged Process
 
-This is a quick lab to see what API sequence makes it possible to inject C\# .NET assemblies / PE files \(.exe and .dll\) into an unmanaged process and invoke their methods. 
+This is a quick lab to see what API sequence makes it possible to inject C\# .NET assemblies / PE files \(.exe and .dll\) into an unmanaged process and invoke their methods.
 
 {% hint style="info" %}
 This is the technique that makes `execute-assembly` command possible in Cobalt Strike.
@@ -18,7 +18,7 @@ At a high level, it works as follows:
 
 ## Code
 
-* `unmanaged.cpp` \(in my lab compiled to `LoadCLR.exe`\) - a C++ program that loads a C\# assembly 
+* `unmanaged.cpp` \(in my lab compiled to `LoadCLR.exe`\) - a C++ program that loads a C\# assembly
 
   `CLRHello1.exe` and invokes its method `spotlessMethod`
 
@@ -51,7 +51,7 @@ int main()
     {
         std::cout << "CLR executed successfully\n";
     }
-    
+
     runtimeInfo->Release();
     metaHost->Release();
     runtimeHost->Release();
@@ -76,7 +76,7 @@ namespace CLRHello1
         {
             return;   
         }
-        
+
         // important: methods called by ExecuteInDefaultAppDomain need to stick to this signature
         static int spotlessMethod(String pwzArgument)
         {
@@ -97,7 +97,7 @@ Below shows how `LoadCLR.exe` loaded our C\# assembly `CLRHello.exe` \(seen in `
 
 ## References
 
-{% embed url="https://blog.xpnsec.com/hiding-your-dotnet-etw/" %}
+{% embed url="https://blog.xpnsec.com/hiding-your-dotnet-etw/" caption="" %}
 
 [https://gist.github.com/xpn/e95a62c6afcf06ede52568fcd8187cc2](https://gist.github.com/xpn/e95a62c6afcf06ede52568fcd8187cc2)
 

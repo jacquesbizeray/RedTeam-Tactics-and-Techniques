@@ -8,7 +8,7 @@
   * a list of function names and their addresses from those DLLs that may be called by the binary at some point
 * It is possible to hook function pointers specified in the IAT by overwriting the target function's address with a rogue function address and optionally to execute the originally intended function
 
-Below is a simplified diagram that attempts to visualize the flow of events before and after a function   
+Below is a simplified diagram that attempts to visualize the flow of events before and after a function  
 \(`MessageBoxA` in this example, but could be any\) is hooked:
 
 ![](../../.gitbook/assets/image%20%28107%29.png)
@@ -68,64 +68,64 @@ PrototypeMessageBox originalMsgBox = MessageBoxA;
 // hooked function with malicious code that eventually calls the original MessageBoxA
 int hookedMessageBox(HWND hWnd, LPCSTR lpText, LPCSTR lpCaption, UINT uType)
 {
-	MessageBoxW(NULL, L"Ola Hooked from a Rogue Senor .o.", L"Ola Senor o/", 0);
-	// execute the original NessageBoxA
-	return originalMsgBox(hWnd, lpText, lpCaption, uType);
+    MessageBoxW(NULL, L"Ola Hooked from a Rogue Senor .o.", L"Ola Senor o/", 0);
+    // execute the original NessageBoxA
+    return originalMsgBox(hWnd, lpText, lpCaption, uType);
 }
 
 int main()
 {
-	// message box before IAT unhooking
-	MessageBoxA(NULL, "Hello Before Hooking", "Hello Before Hooking", 0);
-	
-	LPVOID imageBase = GetModuleHandleA(NULL);
-	PIMAGE_DOS_HEADER dosHeaders = (PIMAGE_DOS_HEADER)imageBase;
-	PIMAGE_NT_HEADERS ntHeaders = (PIMAGE_NT_HEADERS)((DWORD_PTR)imageBase + dosHeaders->e_lfanew);
+    // message box before IAT unhooking
+    MessageBoxA(NULL, "Hello Before Hooking", "Hello Before Hooking", 0);
 
-	PIMAGE_IMPORT_DESCRIPTOR importDescriptor = NULL;
-	IMAGE_DATA_DIRECTORY importsDirectory = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
-	importDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)(importsDirectory.VirtualAddress + (DWORD_PTR)imageBase);
-	LPCSTR libraryName = NULL;
-	HMODULE library = NULL;
-	PIMAGE_IMPORT_BY_NAME functionName = NULL; 
+    LPVOID imageBase = GetModuleHandleA(NULL);
+    PIMAGE_DOS_HEADER dosHeaders = (PIMAGE_DOS_HEADER)imageBase;
+    PIMAGE_NT_HEADERS ntHeaders = (PIMAGE_NT_HEADERS)((DWORD_PTR)imageBase + dosHeaders->e_lfanew);
 
-	while (importDescriptor->Name != NULL)
-	{
-		libraryName = (LPCSTR)importDescriptor->Name + (DWORD_PTR)imageBase;
-		library = LoadLibraryA(libraryName);
+    PIMAGE_IMPORT_DESCRIPTOR importDescriptor = NULL;
+    IMAGE_DATA_DIRECTORY importsDirectory = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+    importDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)(importsDirectory.VirtualAddress + (DWORD_PTR)imageBase);
+    LPCSTR libraryName = NULL;
+    HMODULE library = NULL;
+    PIMAGE_IMPORT_BY_NAME functionName = NULL; 
 
-		if (library)
-		{
-			PIMAGE_THUNK_DATA originalFirstThunk = NULL, firstThunk = NULL;
-			originalFirstThunk = (PIMAGE_THUNK_DATA)((DWORD_PTR)imageBase + importDescriptor->OriginalFirstThunk);
-			firstThunk = (PIMAGE_THUNK_DATA)((DWORD_PTR)imageBase + importDescriptor->FirstThunk);
+    while (importDescriptor->Name != NULL)
+    {
+        libraryName = (LPCSTR)importDescriptor->Name + (DWORD_PTR)imageBase;
+        library = LoadLibraryA(libraryName);
 
-			while (originalFirstThunk->u1.AddressOfData != NULL)
-			{
-				functionName = (PIMAGE_IMPORT_BY_NAME)((DWORD_PTR)imageBase + originalFirstThunk->u1.AddressOfData);
-					
-				// find MessageBoxA address
-				if (std::string(functionName->Name).compare("MessageBoxA") == 0)
-				{
-					SIZE_T bytesWritten = 0;
-					DWORD oldProtect = 0;
-					VirtualProtect((LPVOID)(&firstThunk->u1.Function), 8, PAGE_READWRITE, &oldProtect);
-						
-					// swap MessageBoxA address with address of hookedMessageBox
-					firstThunk->u1.Function = (DWORD_PTR)hookedMessageBox;
-				}
-				++originalFirstThunk;
-				++firstThunk;
-			}
-		}
+        if (library)
+        {
+            PIMAGE_THUNK_DATA originalFirstThunk = NULL, firstThunk = NULL;
+            originalFirstThunk = (PIMAGE_THUNK_DATA)((DWORD_PTR)imageBase + importDescriptor->OriginalFirstThunk);
+            firstThunk = (PIMAGE_THUNK_DATA)((DWORD_PTR)imageBase + importDescriptor->FirstThunk);
 
-		importDescriptor++;
-	}
+            while (originalFirstThunk->u1.AddressOfData != NULL)
+            {
+                functionName = (PIMAGE_IMPORT_BY_NAME)((DWORD_PTR)imageBase + originalFirstThunk->u1.AddressOfData);
 
-	// message box after IAT hooking
-	MessageBoxA(NULL, "Hello after Hooking", "Hello after Hooking", 0);
-	
-	return 0;
+                // find MessageBoxA address
+                if (std::string(functionName->Name).compare("MessageBoxA") == 0)
+                {
+                    SIZE_T bytesWritten = 0;
+                    DWORD oldProtect = 0;
+                    VirtualProtect((LPVOID)(&firstThunk->u1.Function), 8, PAGE_READWRITE, &oldProtect);
+
+                    // swap MessageBoxA address with address of hookedMessageBox
+                    firstThunk->u1.Function = (DWORD_PTR)hookedMessageBox;
+                }
+                ++originalFirstThunk;
+                ++firstThunk;
+            }
+        }
+
+        importDescriptor++;
+    }
+
+    // message box after IAT hooking
+    MessageBoxA(NULL, "Hello after Hooking", "Hello after Hooking", 0);
+
+    return 0;
 }
 ```
 

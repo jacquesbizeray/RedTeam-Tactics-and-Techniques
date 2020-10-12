@@ -42,5 +42,5 @@ Rebooting the compromised system executes the c:\tools\shell.cmd, which in turn 
 
 ## References
 
-{% embed url="https://attack.mitre.org/techniques/T1004/" %}
+{% embed url="https://attack.mitre.org/techniques/T1004/" caption="" %}
 

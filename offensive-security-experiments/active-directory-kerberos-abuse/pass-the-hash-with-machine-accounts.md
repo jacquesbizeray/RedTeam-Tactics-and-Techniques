@@ -94,7 +94,7 @@ Get-NetGroupMember "domain admins" | select membern*
 
 ## References
 
-{% embed url="https://blog.secarma.co.uk/labs/using-machine-account-passwords-during-an-engagement" %}
+{% embed url="https://blog.secarma.co.uk/labs/using-machine-account-passwords-during-an-engagement" caption="" %}
 
-{% embed url="https://www.c0d3xpl0it.com/2018/05/machine-accounts-in-pentest-engagement.html?m=1" %}
+{% embed url="https://www.c0d3xpl0it.com/2018/05/machine-accounts-in-pentest-engagement.html?m=1" caption="" %}
 

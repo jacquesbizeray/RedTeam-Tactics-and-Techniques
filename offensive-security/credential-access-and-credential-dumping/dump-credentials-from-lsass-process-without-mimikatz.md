@@ -48,5 +48,5 @@ Executing a native comsvcs.dll DLL found in Windows\system32 with rundll32:
 
 ## References
 
-{% embed url="https://t.co/s2VePo3ICo?amp=1" %}
+{% embed url="https://t.co/s2VePo3ICo?amp=1" caption="" %}
 

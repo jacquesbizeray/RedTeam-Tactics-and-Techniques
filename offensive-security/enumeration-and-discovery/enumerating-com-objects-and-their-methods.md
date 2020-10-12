@@ -60,5 +60,5 @@ Below shows the output file with all the methods of all COM objects exposed, in 
 
 ## References
 
-{% embed url="https://www.fireeye.com/blog/threat-research/2019/06/hunting-com-objects.html" %}
+{% embed url="https://www.fireeye.com/blog/threat-research/2019/06/hunting-com-objects.html" caption="" %}
 

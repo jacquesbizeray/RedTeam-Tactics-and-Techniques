@@ -33,7 +33,5 @@ The goal of this project is simple - read other researchers work, execute some c
 
 Follow me on twitter:
 
-{% embed url="https://twitter.com/spotheplanet" %}
-
-
+{% embed url="https://twitter.com/spotheplanet" caption="" %}
 

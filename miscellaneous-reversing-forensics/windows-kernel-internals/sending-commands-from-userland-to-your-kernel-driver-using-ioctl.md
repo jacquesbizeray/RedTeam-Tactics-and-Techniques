@@ -49,7 +49,7 @@ Additionally, we can see the symbolic link `SpotlessDeviceLink` pointing to our 
 
 ### MajorFunctions
 
-This function will handle IRPs that request \(`CreateFile`\) or close \(`CloseHandle`\) the handle to our  device `\Device\SpotlessDevice` through the symbolic link `\\.\SpotlessDeviceLink`:
+This function will handle IRPs that request \(`CreateFile`\) or close \(`CloseHandle`\) the handle to our device `\Device\SpotlessDevice` through the symbolic link `\\.\SpotlessDeviceLink`:
 
 ![](../../.gitbook/assets/image.png)
 
@@ -64,7 +64,7 @@ This routine will handle the IOCTL requests sent from our userland program. In t
 ![](../../.gitbook/assets/image%20%2837%29.png)
 
 {% hint style="info" %}
-When `IoDeviceControl` is called in the userland with a custom IOCTL and any input data that we want to be sent to the kernel, the OS intercepts that request and packages it into an I/O Packet \(IRP\), that will then be handed to our callback `HandleCustomIOCTL`, that we previously registered in the `DriverEntry` routine for the IRP `IRP_MJ_DEVICE_CONTROL`. 
+When `IoDeviceControl` is called in the userland with a custom IOCTL and any input data that we want to be sent to the kernel, the OS intercepts that request and packages it into an I/O Packet \(IRP\), that will then be handed to our callback `HandleCustomIOCTL`, that we previously registered in the `DriverEntry` routine for the IRP `IRP_MJ_DEVICE_CONTROL`.
 
 IRP, among many other things, contains the incoming IOCTL code, the input data sent from the userland request and a buffer that the kernel driver code can use to send the response back to the userland program.
 {% endhint %}
@@ -118,102 +118,102 @@ UNICODE_STRING DEVICE_SYMBOLIC_NAME = RTL_CONSTANT_STRING(L"\\??\\SpotlessDevice
 
 void DriverUnload(PDRIVER_OBJECT dob)
 {
-	DbgPrint("Driver unloaded, deleting symbolic links and devices");
-	IoDeleteDevice(dob->DeviceObject);
-	IoDeleteSymbolicLink(&DEVICE_SYMBOLIC_NAME);
+    DbgPrint("Driver unloaded, deleting symbolic links and devices");
+    IoDeleteDevice(dob->DeviceObject);
+    IoDeleteSymbolicLink(&DEVICE_SYMBOLIC_NAME);
 }
 
 NTSTATUS HandleCustomIOCTL(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 {
-	UNREFERENCED_PARAMETER(DeviceObject);
-	PIO_STACK_LOCATION stackLocation = NULL;
-	CHAR *messageFromKernel = "ohai from them kernelz";
+    UNREFERENCED_PARAMETER(DeviceObject);
+    PIO_STACK_LOCATION stackLocation = NULL;
+    CHAR *messageFromKernel = "ohai from them kernelz";
 
-	stackLocation = IoGetCurrentIrpStackLocation(Irp);
-	
-	if (stackLocation->Parameters.DeviceIoControl.IoControlCode == IOCTL_SPOTLESS)
-	{
-		DbgPrint("IOCTL_SPOTLESS (0x%x) issued", stackLocation->Parameters.DeviceIoControl.IoControlCode);
-		DbgPrint("Input received from userland: %s", (char*)Irp->AssociatedIrp.SystemBuffer);
-	}
+    stackLocation = IoGetCurrentIrpStackLocation(Irp);
 
-	Irp->IoStatus.Information = strlen(messageFromKernel);
-	Irp->IoStatus.Status = STATUS_SUCCESS;
-	
-	DbgPrint("Sending to userland: %s", messageFromKernel);
-	RtlCopyMemory(Irp->AssociatedIrp.SystemBuffer, messageFromKernel, strlen(Irp->AssociatedIrp.SystemBuffer));
-	
-	IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    if (stackLocation->Parameters.DeviceIoControl.IoControlCode == IOCTL_SPOTLESS)
+    {
+        DbgPrint("IOCTL_SPOTLESS (0x%x) issued", stackLocation->Parameters.DeviceIoControl.IoControlCode);
+        DbgPrint("Input received from userland: %s", (char*)Irp->AssociatedIrp.SystemBuffer);
+    }
 
-	return STATUS_SUCCESS;
+    Irp->IoStatus.Information = strlen(messageFromKernel);
+    Irp->IoStatus.Status = STATUS_SUCCESS;
+
+    DbgPrint("Sending to userland: %s", messageFromKernel);
+    RtlCopyMemory(Irp->AssociatedIrp.SystemBuffer, messageFromKernel, strlen(Irp->AssociatedIrp.SystemBuffer));
+
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+
+    return STATUS_SUCCESS;
 }
 
 NTSTATUS MajorFunctions(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 {
-	UNREFERENCED_PARAMETER(DeviceObject);
+    UNREFERENCED_PARAMETER(DeviceObject);
 
-	PIO_STACK_LOCATION stackLocation = NULL;
-	stackLocation = IoGetCurrentIrpStackLocation(Irp);
+    PIO_STACK_LOCATION stackLocation = NULL;
+    stackLocation = IoGetCurrentIrpStackLocation(Irp);
 
-	switch (stackLocation->MajorFunction)
-	{
-	case IRP_MJ_CREATE:
-		DbgPrint("Handle to symbolink link %wZ opened", DEVICE_SYMBOLIC_NAME);
-		break;
-	case IRP_MJ_CLOSE:
-		DbgPrint("Handle to symbolink link %wZ closed", DEVICE_SYMBOLIC_NAME);
-		break;
-	default:
-		break;
-	}
-	
-	Irp->IoStatus.Information = 0;
-	Irp->IoStatus.Status = STATUS_SUCCESS;
-	IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    switch (stackLocation->MajorFunction)
+    {
+    case IRP_MJ_CREATE:
+        DbgPrint("Handle to symbolink link %wZ opened", DEVICE_SYMBOLIC_NAME);
+        break;
+    case IRP_MJ_CLOSE:
+        DbgPrint("Handle to symbolink link %wZ closed", DEVICE_SYMBOLIC_NAME);
+        break;
+    default:
+        break;
+    }
 
-	return STATUS_SUCCESS;
+    Irp->IoStatus.Information = 0;
+    Irp->IoStatus.Status = STATUS_SUCCESS;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+
+    return STATUS_SUCCESS;
 }
 
 NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) 
 {
-	UNREFERENCED_PARAMETER(DriverObject);
-	UNREFERENCED_PARAMETER(RegistryPath);
-	
-	NTSTATUS status	= 0;
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNREFERENCED_PARAMETER(RegistryPath);
 
-	// routine that will execute when our driver is unloaded/service is stopped
-	DriverObject->DriverUnload = DriverUnload;
-	
-	// routine for handling IO requests from userland
-	DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = HandleCustomIOCTL;
-	
-	// routines that will execute once a handle to our device's symbolik link is opened/closed
-	DriverObject->MajorFunction[IRP_MJ_CREATE] = MajorFunctions;
-	DriverObject->MajorFunction[IRP_MJ_CLOSE] = MajorFunctions;
-	
-	DbgPrint("Driver loaded");
+    NTSTATUS status    = 0;
 
-	IoCreateDevice(DriverObject, 0, &DEVICE_NAME, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &DriverObject->DeviceObject);
-	if (!NT_SUCCESS(status))
-	{
-		DbgPrint("Could not create device %wZ", DEVICE_NAME);
-	}
-	else 
-	{
-		DbgPrint("Device %wZ created", DEVICE_NAME);
-	}
+    // routine that will execute when our driver is unloaded/service is stopped
+    DriverObject->DriverUnload = DriverUnload;
 
-	status = IoCreateSymbolicLink(&DEVICE_SYMBOLIC_NAME, &DEVICE_NAME);
-	if (NT_SUCCESS(status))
-	{
-		DbgPrint("Symbolic link %wZ created", DEVICE_SYMBOLIC_NAME);
-	}
-	else
-	{
-		DbgPrint("Error creating symbolic link %wZ", DEVICE_SYMBOLIC_NAME);
-	}
-	
-	return STATUS_SUCCESS;
+    // routine for handling IO requests from userland
+    DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = HandleCustomIOCTL;
+
+    // routines that will execute once a handle to our device's symbolik link is opened/closed
+    DriverObject->MajorFunction[IRP_MJ_CREATE] = MajorFunctions;
+    DriverObject->MajorFunction[IRP_MJ_CLOSE] = MajorFunctions;
+
+    DbgPrint("Driver loaded");
+
+    IoCreateDevice(DriverObject, 0, &DEVICE_NAME, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &DriverObject->DeviceObject);
+    if (!NT_SUCCESS(status))
+    {
+        DbgPrint("Could not create device %wZ", DEVICE_NAME);
+    }
+    else 
+    {
+        DbgPrint("Device %wZ created", DEVICE_NAME);
+    }
+
+    status = IoCreateSymbolicLink(&DEVICE_SYMBOLIC_NAME, &DEVICE_NAME);
+    if (NT_SUCCESS(status))
+    {
+        DbgPrint("Symbolic link %wZ created", DEVICE_SYMBOLIC_NAME);
+    }
+    else
+    {
+        DbgPrint("Error creating symbolic link %wZ", DEVICE_SYMBOLIC_NAME);
+    }
+
+    return STATUS_SUCCESS;
 }
 ```
 {% endcode %}
@@ -235,9 +235,9 @@ int main(char argc, char ** argv)
     CHAR outBuffer[128] = {0};
 
     RtlCopyMemory(inBuffer, argv[1], strlen(argv[1]));
-    
+
     device = CreateFileW(L"\\\\.\\SpotlessDeviceLink", GENERIC_ALL, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_SYSTEM, 0);
-    
+
     if (device == INVALID_HANDLE_VALUE)
     {
         printf_s("> Could not open device: 0x%x\n", GetLastError());
@@ -257,13 +257,13 @@ int main(char argc, char ** argv)
 
 ## References
 
-{% embed url="https://www.osronline.com/article.cfm%5Eid=92.htm" %}
+{% embed url="https://www.osronline.com/article.cfm%5Eid=92.htm" caption="" %}
 
-{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-deviceiocontrol" %}
+{% embed url="https://docs.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-deviceiocontrol" caption="" %}
 
-{% embed url="https://www.drdobbs.com/windows/sending-ioctls-to-windows-nt-drivers/184416453" %}
+{% embed url="https://www.drdobbs.com/windows/sending-ioctls-to-windows-nt-drivers/184416453" caption="" %}
 
-{% embed url="https://cylus.org/windows-drivers-part-2-ioctls-c678526f90ae" %}
+{% embed url="https://cylus.org/windows-drivers-part-2-ioctls-c678526f90ae" caption="" %}
 
-{% embed url="https://ericasselin.com/userlandkernel-communication-deviceiocontrol-method" %}
+{% embed url="https://ericasselin.com/userlandkernel-communication-deviceiocontrol-method" caption="" %}
 

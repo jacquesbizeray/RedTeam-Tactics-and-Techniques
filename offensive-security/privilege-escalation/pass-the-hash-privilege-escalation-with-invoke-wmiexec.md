@@ -44,5 +44,5 @@ Invoke-WmiExec -target ws01 -hash 32ed87bd5fdc5e9cba88547376818d4 -username spot
 
 ## References
 
-{% embed url="https://www.harmj0y.net/blog/redteaming/pass-the-hash-is-dead-long-live-localaccounttokenfilterpolicy/" %}
+{% embed url="https://www.harmj0y.net/blog/redteaming/pass-the-hash-is-dead-long-live-localaccounttokenfilterpolicy/" caption="" %}
 

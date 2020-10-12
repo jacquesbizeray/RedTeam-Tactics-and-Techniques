@@ -230,3 +230,7 @@
 * [AES Encryption Using Crypto++ .lib in Visual Studio C++](miscellaneous-reversing-forensics/aes-encryption-example-using-cryptopp-.lib-in-visual-studio-c++.md)
 * [Reversing Password Checking Routine](miscellaneous-reversing-forensics/reversing-password-checking-routine.md)
 
+---
+
+* [JS Reverse Enginnering](js-reverse-enginnering.md)
+

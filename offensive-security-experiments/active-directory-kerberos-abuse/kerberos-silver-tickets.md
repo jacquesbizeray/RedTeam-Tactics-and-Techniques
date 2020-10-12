@@ -10,7 +10,7 @@ This lab builds on the explorations in [T1208: Kerberoasting](t1208-kerberoastin
 
 ## Execution
 
-I will be using mimikatz to create a Kerberos Silver Ticket - forging/rewriting the cracked ticket with some new details that benefit me as an attacker. 
+I will be using mimikatz to create a Kerberos Silver Ticket - forging/rewriting the cracked ticket with some new details that benefit me as an attacker.
 
 Below is a table with values supplied to mimikatz explained and the command itself:
 
@@ -72,7 +72,7 @@ It is better not to use user accounts for running services on them, but if you d
 
 ## References
 
-{% embed url="https://blog.stealthbits.com/impersonating-service-accounts-with-silver-tickets" %}
+{% embed url="https://blog.stealthbits.com/impersonating-service-accounts-with-silver-tickets" caption="" %}
 
-{% embed url="https://adsecurity.org/?p=2011" %}
+{% embed url="https://adsecurity.org/?p=2011" caption="" %}
 

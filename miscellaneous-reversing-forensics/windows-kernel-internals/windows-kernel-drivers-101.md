@@ -65,7 +65,5 @@ There are many different types of drivers, but I am mostly interested in `Sofwar
 
 ## References
 
-{% embed url="https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/packet-driven-i-o-with-reusable-irps" %}
-
-
+{% embed url="https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/packet-driven-i-o-with-reusable-irps" caption="" %}
 

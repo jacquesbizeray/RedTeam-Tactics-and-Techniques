@@ -14,12 +14,12 @@ Get-NetUser -TrustedToAuth
 ```
 {% endcode %}
 
-In the below screenshot, the user `spot` is allowed to delegate or in other words, impersonate any user and authenticate to a file system service \(CIFS\) on a domain controller DC01. 
+In the below screenshot, the user `spot` is allowed to delegate or in other words, impersonate any user and authenticate to a file system service \(CIFS\) on a domain controller DC01.
 
 {% hint style="info" %}
 User has to have an attribute `TRUSTED_TO_AUTH_FOR_DELEGATION` in order for it to be able to authenticate to the remote service.
 
-> TRUSTED\_TO\_AUTH\_FOR\_DELEGATION - \(Windows 2000/Windows Server 2003\) The account is enabled for delegation. This is a security-sensitive setting. Accounts that have this option enabled should be tightly controlled. This setting lets a service that runs under the account assume a client's identity and authenticate as that user to other remote servers on the network. 
+> TRUSTED\_TO\_AUTH\_FOR\_DELEGATION - \(Windows 2000/Windows Server 2003\) The account is enabled for delegation. This is a security-sensitive setting. Accounts that have this option enabled should be tightly controlled. This setting lets a service that runs under the account assume a client's identity and authenticate as that user to other remote servers on the network.
 >
 > [https://support.microsoft.com/en-gb/help/305144/how-to-use-useraccountcontrol-to-manipulate-user-account-properties](https://support.microsoft.com/en-gb/help/305144/how-to-use-useraccountcontrol-to-manipulate-user-account-properties)
 {% endhint %}
@@ -97,7 +97,7 @@ Note that in this case we requested a TGS for the CIFS service, but we could als
 
 ## Computer Account
 
-If you have compromised a machine account or in other words you have a SYSTEM level privileges on a machine that is configured with constrained delegation, you can assume any identity in the AD domain and authenticate to services that the compromised machine is trusted to delegate to. 
+If you have compromised a machine account or in other words you have a SYSTEM level privileges on a machine that is configured with constrained delegation, you can assume any identity in the AD domain and authenticate to services that the compromised machine is trusted to delegate to.
 
 In this lab, a workstation WS02 is trusted to delegate to DC01 for CIFS and LDAP services and I am going to exploit the CIFS services this time:
 
@@ -143,13 +143,13 @@ ls \\dc01.offense.local\c$
 
 ## References
 
-{% embed url="https://www.harmj0y.net/blog/activedirectory/s4u2pwnage/" %}
+{% embed url="https://www.harmj0y.net/blog/activedirectory/s4u2pwnage/" caption="" %}
 
-{% embed url="https://www.harmj0y.net/blog/activedirectory/the-most-dangerous-user-right-you-probably-have-never-heard-of/" %}
+{% embed url="https://www.harmj0y.net/blog/activedirectory/the-most-dangerous-user-right-you-probably-have-never-heard-of/" caption="" %}
 
-{% embed url="https://blogs.msdn.microsoft.com/mattlind/2010/01/13/delegation-tab-in-aduc-not-available-until-a-spn-is-set/" %}
+{% embed url="https://blogs.msdn.microsoft.com/mattlind/2010/01/13/delegation-tab-in-aduc-not-available-until-a-spn-is-set/" caption="" %}
 
-{% embed url="https://blogs.technet.microsoft.com/tristank/2007/06/18/kdc\_err\_badoption-when-attempting-constrained-delegation/" %}
+{% embed url="https://blogs.technet.microsoft.com/tristank/2007/06/18/kdc\_err\_badoption-when-attempting-constrained-delegation/" caption="" %}
 
-{% embed url="https://support.microsoft.com/en-gb/help/305144/how-to-use-useraccountcontrol-to-manipulate-user-account-properties" %}
+{% embed url="https://support.microsoft.com/en-gb/help/305144/how-to-use-useraccountcontrol-to-manipulate-user-account-properties" caption="" %}
 

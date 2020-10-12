@@ -12,10 +12,10 @@ Lab is performed on Windows 10 Professional x64, 1903.
 Some replies to my tweet to this post suggested that PatchGuard would normally kick-in and BSOD the OS, which I am sure is the case, although in my lab I experienced no BSODs even though the kernel stayed patched with an unlinked process for 12+ hours.
 
 **Update 2**  
-I realized that my Windows VM is running in test mode with no integrity checks, possibly explaining the lack os BSODs - unconfirmed.  
-  
+I realized that my Windows VM is running in test mode with no integrity checks, possibly explaining the lack os BSODs - unconfirmed.
+
 **Update 3**  
-Thanks ****[**@**FuzzySec](https://twitter.com/FuzzySec) for clarifying the BSOD/PatchGuard matter!
+Thanks **\*\*\[**@\*\*FuzzySec\]\([https://twitter.com/FuzzySec](https://twitter.com/FuzzySec)\) for clarifying the BSOD/PatchGuard matter!
 
 ![](../../.gitbook/assets/image%20%2834%29.png)
 
@@ -43,7 +43,7 @@ Simplified \(head and tail omitted\) graphical representation of the doubly-link
 
 ![](../../.gitbook/assets/image%20%28284%29.png)
 
-`LIST_ENTRY` is the doubly-linked list equivalent data structure in Windows kernel and is defined as: 
+`LIST_ENTRY` is the doubly-linked list equivalent data structure in Windows kernel and is defined as:
 
 ```erlang
 kd> dt _list_entry
@@ -123,9 +123,9 @@ Below shows in two different ways \(1. observing `ActiveProcessLinks` from the E
 
 ![](../../.gitbook/assets/image%20%28281%29.png)
 
-For curiosity, we can check the process's image name referenced by the notepad's FLINK at ``ffffb208`f8d1e7b0`` - the next EPROCESS node to our notepad's EPROCESS: 
+For curiosity, we can check the process's image name referenced by the notepad's FLINK at ``ffffb208`f8d1e7b0`` - the next EPROCESS node to our notepad's EPROCESS:
 
-We need to: 
+We need to:
 
 * find the EPROCESS location by subtracting 0x2f0 from the FLINK ``ffffb208`f8d1e7b0``. This is because FLINK points to `EPROCESS.ActiveProcessLinks` and `ActiveProcessLinks` is located at offset 0x2f0 from the beginning of the EPROCESS location
 * add 0x450 since this is the offset of the `ImageFileName` in the EPROCESS structure
@@ -170,7 +170,7 @@ PROCESS ffffb208f8b89080
     Image: svchost.exe
 ```
 
-Below shows essentially the same as the above output with some colour-coding: 
+Below shows essentially the same as the above output with some colour-coding:
 
 ![](../../.gitbook/assets/image%20%2813%29.png)
 
@@ -213,7 +213,7 @@ We can now summarize the FLINK and BLINK pointers we have for all the processes 
 | Image | PID | EPROCESS | ActiveProcessLinks | Flink | Blink |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | svchost | 0x1464 | ffffb208f8b89080 | ffffb208\`f8b89370 | ffffb208\`f8b307b0 | ffffb208\`f96c97b0 |
-| notepad | 0xe14  | ffffb208f8b304c0 | ffffb208\`f8b307b0 | ffffb208\`f8d1e7b0 | ffffb208\`f8b89370 |
+| notepad | 0xe14 | ffffb208f8b304c0 | ffffb208\`f8b307b0 | ffffb208\`f8d1e7b0 | ffffb208\`f8b89370 |
 | svchost | 0x9cc | ffffb208f8d1e4c0 | ffffb208\`f8d1e7b0 | ffffb208\`f94ee7b0 | ffffb208\`f8b307b0 |
 
 Below are the two kernel modifications we need to perform in order to hide notepad.exe from process listing APIs in the userland:
@@ -260,7 +260,7 @@ In order to detect unlinked processes exhibited by malware on systems without Pa
 
 ## References
 
-{% embed url="https://www.aldeid.com/wiki/LIST\_ENTRY" %}
+{% embed url="https://www.aldeid.com/wiki/LIST\_ENTRY" caption="" %}
 
-{% embed url="https://www.hackerearth.com/practice/notes/doubly-linked-list-data-structure-in-c/" %}
+{% embed url="https://www.hackerearth.com/practice/notes/doubly-linked-list-data-structure-in-c/" caption="" %}
 

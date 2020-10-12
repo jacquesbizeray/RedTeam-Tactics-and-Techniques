@@ -32,7 +32,7 @@ My test red team infrasture is built by leveraging the following services and pr
 * DigitalOcean DNS management for the smtp relay \(phishing redirector\) - mostly because we need the ability to set a `PTR` DNS record for our smtp relay in order to reduce chances of our phishing email being classified as spam by target users' mail gateways
 * CloudFlare DNS management for controlling DNS records for any other domains that point to our long-term servers
 
-Note however, you could build your servers using Amazon AWS or other popular VPS provider as long as it is supported by [Terraform](https://www.terraform.io/docs/providers/). Same applies to the DNS management piece. I used DigitalOcean and CloudFlare because I already had accounts and I like them ¯\\_\(ツ\)\_/¯
+Note however, you could build your servers using Amazon AWS or other popular VPS provider as long as it is supported by [Terraform](https://www.terraform.io/docs/providers/). Same applies to the DNS management piece. I used DigitalOcean and CloudFlare because I already had accounts and I like them ¯\_\(ツ\)\_/¯
 
 ### File Structure
 
@@ -66,7 +66,7 @@ Additionally, `variables.tf` contains link to a password protected Cobalt Strike
 
 ### C2
 
-For this lab, I chose Cobalt Strike as my C2 server. 
+For this lab, I chose Cobalt Strike as my C2 server.
 
 Below is the `remote-exec` Terraform provisioner for C2 server that downloads CS zip, unzips it with a given CS password and creates a cron job to make sure the C2 server is started once the server boots up:
 
@@ -197,9 +197,9 @@ Also, note the last highlighted bit - an instruction for an operator to execute 
 
 ![](../../.gitbook/assets/screenshot-from-2019-01-28-21-49-44.png)
 
-The DNS record `mail._domainkey` placeholder with a dummy value "I am DKIM, but change with the DKIM from finalize.sh" is created \(`dns.tr` file\) for ones convenience - that value needs to be replaced with the above highlighted DKIM value provided by the finalize.sh script. 
+The DNS record `mail._domainkey` placeholder with a dummy value "I am DKIM, but change with the DKIM from finalize.sh" is created \(`dns.tr` file\) for ones convenience - that value needs to be replaced with the above highlighted DKIM value provided by the finalize.sh script.
 
-Ideally, this step would be automated during the droplet bootstrapping, but I was not yet able to do that due to some Terraform bugs I encountered. 
+Ideally, this step would be automated during the droplet bootstrapping, but I was not yet able to do that due to some Terraform bugs I encountered.
 
 Below shows \(top to bottom\):
 
@@ -213,17 +213,15 @@ Below shows \(top to bottom\):
 
 If you would like to test this setup, feel free to grab the config files here:
 
-{% embed url="https://github.com/mantvydasb/Red-Team-Infrastructure-Automation" %}
+{% embed url="https://github.com/mantvydasb/Red-Team-Infrastructure-Automation" caption="" %}
 
 ## References
 
-{% embed url="https://bluescreenofjeff.com/2016-03-22-strengthen-your-phishing-with-apache-mod\_rewrite-and-mobile-user-redirection/" %}
+{% embed url="https://bluescreenofjeff.com/2016-03-22-strengthen-your-phishing-with-apache-mod\_rewrite-and-mobile-user-redirection/" caption="" %}
 
-{% embed url="https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform-part-1/" %}
+{% embed url="https://rastamouse.me/2017/08/automated-red-team-infrastructure-deployment-with-terraform-part-1/" caption="" %}
 
-{% embed url="https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-dkim-with-postfix-on-debian-wheezy" %}
+{% embed url="https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-dkim-with-postfix-on-debian-wheezy" caption="" %}
 
-{% embed url="https://developers.digitalocean.com/documentation/changelog/api-v2/new-size-slugs-for-droplet-plan-changes/" %}
-
-
+{% embed url="https://developers.digitalocean.com/documentation/changelog/api-v2/new-size-slugs-for-droplet-plan-changes/" caption="" %}
 

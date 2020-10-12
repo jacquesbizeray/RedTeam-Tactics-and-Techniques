@@ -7,7 +7,7 @@ This quick lab covers two Windows service misconfigurations that allow an attack
 
 ## 1. Changing Service Configuration
 
-Let's enumerate services with `accesschk` from SysInternals and look for `SERVICE_ALL_ACCESS` or  `SERVICE_CHANGE_CONFIG` as these privileges allow attackers to modify service configuration:
+Let's enumerate services with `accesschk` from SysInternals and look for `SERVICE_ALL_ACCESS` or `SERVICE_CHANGE_CONFIG` as these privileges allow attackers to modify service configuration:
 
 {% code title="attacker@victim" %}
 ```text

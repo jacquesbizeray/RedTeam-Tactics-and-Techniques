@@ -18,10 +18,10 @@ Create a simple C program that includes the shellcode. In my case, I'm simply ad
 #include <stdio.h>
 
 int main() {
-	printf("spotless");
+    printf("spotless");
     asm(".byte 0x90,0x90,0x90,0x90\n\t"
-		"ret\n\t");
-	return 0;
+        "ret\n\t");
+    return 0;
 }
 ```
 {% endcode %}
@@ -38,5 +38,5 @@ Debugging the code via xdbg, we can see where the string `spotless` is going to 
 
 ## References
 
-{% embed url="https://github.com/Mr-Un1k0d3r/Shellcoding" %}
+{% embed url="https://github.com/Mr-Un1k0d3r/Shellcoding" caption="" %}
 

