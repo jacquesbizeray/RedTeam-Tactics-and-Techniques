@@ -29,9 +29,3 @@ The goal of this project is simple - read other researchers work, execute some c
 * try out industry tools and become more profficient in using them
 * take notes for future reference
 
-## Social
-
-Follow me on twitter:
-
-{% embed url="https://twitter.com/spotheplanet" caption="" %}
-
