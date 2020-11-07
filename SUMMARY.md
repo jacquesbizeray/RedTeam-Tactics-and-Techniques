@@ -234,7 +234,3 @@
 
 * [JS Reverse Enginnering](js-reverse-enginnering.md)
 
-## Windows Forensics
-
-* [Untitled](windows-forensics/untitled.md)
-
