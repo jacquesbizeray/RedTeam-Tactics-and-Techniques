@@ -240,5 +240,6 @@
 
 ## CTF
 
-* [BlueTeam Labs Online](ctf/blueteam-labs-online.md)
+* [BlueTeam Labs Online](ctf/blueteam-labs-online/README.md)
+  * [Memory Analysis Ransomware](ctf/blueteam-labs-online/memory-analysis-ransomware.md)
 
