@@ -23,7 +23,7 @@ As we can see the result for our memory dump we were suggested to use the **Win7
 
 Answer: **@WanaDecryptor**
 
-![psscan plugin output](../../.gitbook/assets/image%20%283%29.png)
+![psscan plugin output](../../.gitbook/assets/image%20%287%29.png)
 
 ## What is the parent process ID for the suspicious process?
 
@@ -33,20 +33,42 @@ Answer: **2732**
 **Basic Process Architecture**
 {% endhint %}
 
-![](../../.gitbook/assets/image%20%287%29.png)
+![](../../.gitbook/assets/image%20%288%29.png)
 
 {% hint style="info" %}
  **Processos e Thread**: Basicamente o processo é uma instância de um programa em execução em memória. Um programa pode executar N processos para diferentes tarefas e todos esses subprocessos são conhecidos como **processos filhos** que são iniciados por um **processo pai**. Todos esses processos com área de memória não compartilhada. Quando falamos de threads estamos falando de subrotinas dentro de um mesmo processo com espaço de memória compartilhada.
 {% endhint %}
 
-Once you're strong enough, save the world:
+## What is the initial malicious executable that created this process?
 
-{% code title="hello.sh" %}
+Answer: **or4qtckT.exe**
+
+![](../../.gitbook/assets/image%20%2811%29.png)
+
+## If you drill down on the suspicious PID \(vol.py -f infected.vmem --profile=Win7SP1x86 psscan \| grep \(PIDhere\)\), find the process used to delete files
+
+Answer: **taskdl.exe**
+
+Processo **taskdl.exe** tem como PPID o processo **or4qtckT.exe** que é o processo inicial malicioso
+
+![pscan grep](../../.gitbook/assets/image%20%283%29.png)
+
+## Find the path where the malicious file was first executed
+
+Let’s now take a look at the last commands ran, by using **cmdscan**, **consoles** and **cmdline** plugins.
+
+Answer: **C:\Users\hacker\Desktop\or4qtckT.exe**
+
+
+
 ```bash
-# Ain't no code for that yet, sorry
-echo 'You got to trust me on this, I saved the world'
+root@sapiens:~/Downloads/BTLO Memory Analysis - Ransomware# volatility -f infected.vmem --profile=Win7SP1x86 cmdline
+************************************************************************
+or4qtckT.exe pid:   2732
+Command line : "C:\Users\hacker\Desktop\or4qtckT.exe" 
+************************************************************************
+
 ```
-{% endcode %}
 
 
 
