@@ -2,6 +2,7 @@
 
 * [What is this?](README.md)
 * [Links](links/README.md)
+  * [CTF Platforms](links/ctf-platforms.md)
   * [Blue team](links/blue-team.md)
 
 ## Pinned <a id="offensive-security-experiments"></a>
