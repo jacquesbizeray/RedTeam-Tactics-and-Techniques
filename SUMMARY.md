@@ -1,6 +1,9 @@
 # Table of contents
 
 * [What is this?](README.md)
+* [Lists](lists/README.md)
+  * [OSINT](lists/osint.md)
+  * [Steganography](lists/steganography.md)
 * [Links](links/README.md)
   * [CTF Platforms](links/ctf-platforms.md)
   * [Blue team](links/blue-team.md)
