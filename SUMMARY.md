@@ -1,6 +1,6 @@
 # Table of contents
 
-* [What is this?](README.md)
+* [External Recon Methodology](README.md)
 * [Lists](lists/README.md)
   * [OSINT](lists/osint.md)
   * [Steganography](lists/steganography.md)
@@ -245,5 +245,6 @@
 ## CTF
 
 * [BlueTeam Labs Online](ctf/blueteam-labs-online/README.md)
+  * [Reverse Engineering - Another Injection](ctf/blueteam-labs-online/reverse-engineering-another-injection.md)
   * [Memory Analysis Ransomware](ctf/blueteam-labs-online/memory-analysis-ransomware.md)
 
